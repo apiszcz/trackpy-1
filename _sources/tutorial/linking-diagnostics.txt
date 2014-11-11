@@ -1,0 +1,743 @@
+
+Obtaining Diagnostic Information from Linking
+=============================================
+
+Beginning with version 0.3, ``link_df()`` and ``link_df_iter()`` can
+include diagnostic data in their output, to give you clues about what
+the linking algorithm did while linking each particle. This information
+may help to diagnose errors or bad results from linking, or to verify
+that the linking algorithm is working properly.
+
+How to use it
+-------------
+
+Pass the optional keyword argument ``diagnostics=True`` to ``link_df()``
+or ``link_df_iter()``. The linker will add the "particle" column as
+usual, along with extra columns whose names begin with "``diag_``\ ".
+Not all types of diagnostic data may pertain to every particle, so that
+many entries in these diagnostic columns will have the placeholder value
+of ``NaN`` (not a number).
+
+We'll discuss the individual columns and their meanings below, by way of
+an example: the ``bulk_water`` movie that was tracked in the walkthrough
+tutorial.
+
+Details
+~~~~~~~
+
+1. Diagnostics typically slow down linking by a few percent and consume
+   significant additional memory, so they are turned off by default.
+2. If you already ran linking with diagnostics turned on, but no longer
+   want the extra columns cluttering up your results, you can use the
+   ``strip_diagnostics()`` function to automatically remove all columns
+   whose names start with "``diag_``\ ".
+3. The set of diagnostic of columns, and the order in which they appear,
+   is not fixed. Each column is added only if that diagnostic datum was
+   recorded. For example, below we will encounter the
+   ``diag_remembered`` column that gives information about the
+   ``memory`` feature. If you did not specify the ``memory`` option for
+   linking, this column will never be present in your results.
+4. For performance reasons, ``link_df()`` ordinarily does *not* make a
+   copy of its input DataFrame, instead modifying it in-place. For
+   practical reasons, however, with diagnostics enabled ``link_df()``
+   must work on a copy. Depending on how it was written, your program
+   may therefore behave differently when diagnostics are turned on! If
+   you suspect a problem, you can instruct ``link_df()`` to behave more
+   consistently by supplying ``copy_features=True``.
+
+Example
+-------
+
+We'll track the ``bulk_water`` movie much as in the walkthrough, but
+with ``diagnostics=True``. We'll then examine the data we get back.
+First, we set up our environment:
+
+.. code:: python
+
+    # For the IPython notebook
+    %matplotlib inline
+    
+    
+    from __future__ import print_function  # For compatibility with both Python 2 and 3
+    import numpy as np
+    import pandas as pd
+    from pandas import DataFrame, Series
+    
+    import pims
+    import trackpy as tp
+4 frames should be enough for this demonstration.
+
+.. code:: python
+
+    frames = pims.ImageSequence('../sample_data/bulk_water/*.png', as_grey=True)
+    
+    f = tp.batch(frames[:4], 11, minmass=2000, invert=True, meta=False)
+
+.. parsed-literal::
+
+    Frame 3: 454 features
+
+
+We'll link with a larger ``search_radius`` than in the tutorial, because
+we want to generate a lot of subnetworks (more on that below).
+
+.. code:: python
+
+    t = tp.link_df(f, 13, memory=3, diagnostics=True)
+
+.. parsed-literal::
+
+    Frame 3: 454 trajectories present
+
+
+When we look at the columns in the resulting tracks DataFrame, we see
+some new names:
+
+.. code:: python
+
+    list(t.columns)
+
+
+
+.. parsed-literal::
+
+    [u'x',
+     u'y',
+     u'mass',
+     u'size',
+     u'ecc',
+     u'signal',
+     u'ep',
+     u'frame',
+     u'particle',
+     u'diag_search_range',
+     u'diag_subnet',
+     u'diag_subnet_iterations',
+     u'diag_subnet_size',
+     u'diag_remembered']
+
+
+
+Let's look at the first 5 rows in the results. Because there are so many
+columns, we'll transpose the data so they fit on the page.
+
+.. code:: python
+
+    t.head().T
+
+
+
+.. raw:: html
+
+    <div style="max-height:1000px;max-width:1500px;overflow:auto;">
+    <table border="1" class="dataframe">
+      <thead>
+        <tr style="text-align: right;">
+          <th></th>
+          <th>0</th>
+          <th>1</th>
+          <th>2</th>
+          <th>3</th>
+          <th>4</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>x</th>
+          <td>   295.1748</td>
+          <td>   295.3752</td>
+          <td>  296.3342</td>
+          <td>   296.0958</td>
+          <td>   309.7269</td>
+        </tr>
+        <tr>
+          <th>y</th>
+          <td>   5.537289</td>
+          <td>   5.242568</td>
+          <td>  5.641714</td>
+          <td>    5.86064</td>
+          <td>    6.88456</td>
+        </tr>
+        <tr>
+          <th>mass</th>
+          <td>       3741</td>
+          <td>       3801</td>
+          <td>      4061</td>
+          <td>       4248</td>
+          <td>       2798</td>
+        </tr>
+        <tr>
+          <th>size</th>
+          <td>   2.624754</td>
+          <td>    2.56081</td>
+          <td>  2.720502</td>
+          <td>   2.772655</td>
+          <td>   3.342227</td>
+        </tr>
+        <tr>
+          <th>ecc</th>
+          <td>  0.1650543</td>
+          <td>    0.19938</td>
+          <td> 0.2037625</td>
+          <td>  0.2161286</td>
+          <td>  0.0592067</td>
+        </tr>
+        <tr>
+          <th>signal</th>
+          <td>   35.44475</td>
+          <td>   55.57995</td>
+          <td>  43.54474</td>
+          <td>   38.58652</td>
+          <td>  -112.5553</td>
+        </tr>
+        <tr>
+          <th>ep</th>
+          <td> 0.07923014</td>
+          <td> 0.05308473</td>
+          <td> 0.0617964</td>
+          <td> 0.06639387</td>
+          <td>-0.01616131</td>
+        </tr>
+        <tr>
+          <th>frame</th>
+          <td>          0</td>
+          <td>          1</td>
+          <td>         2</td>
+          <td>          3</td>
+          <td>          0</td>
+        </tr>
+        <tr>
+          <th>particle</th>
+          <td>          0</td>
+          <td>          0</td>
+          <td>         0</td>
+          <td>          0</td>
+          <td>          1</td>
+        </tr>
+        <tr>
+          <th>diag_search_range</th>
+          <td>        NaN</td>
+          <td>         13</td>
+          <td>        13</td>
+          <td>         13</td>
+          <td>        NaN</td>
+        </tr>
+        <tr>
+          <th>diag_subnet</th>
+          <td>        NaN</td>
+          <td>        NaN</td>
+          <td>       NaN</td>
+          <td>        NaN</td>
+          <td>        NaN</td>
+        </tr>
+        <tr>
+          <th>diag_subnet_iterations</th>
+          <td>        NaN</td>
+          <td>        NaN</td>
+          <td>       NaN</td>
+          <td>        NaN</td>
+          <td>        NaN</td>
+        </tr>
+        <tr>
+          <th>diag_subnet_size</th>
+          <td>        NaN</td>
+          <td>        NaN</td>
+          <td>       NaN</td>
+          <td>        NaN</td>
+          <td>        NaN</td>
+        </tr>
+        <tr>
+          <th>diag_remembered</th>
+          <td>        NaN</td>
+          <td>        NaN</td>
+          <td>       NaN</td>
+          <td>        NaN</td>
+          <td>        NaN</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+
+
+``diag_search_range``
+~~~~~~~~~~~~~~~~~~~~~
+
+``trackpy`` didn't record every kind of diagnostic data for every
+feature. We do notice, however, that there is a ``diag_search_range``
+for everything past the first frame. This column is the value of
+``search_range`` that was used to find a particle and link it. Since the
+particles in the first frame did not need to be found,
+``diag_search_range`` is null there. But for the second and third frames
+(numbers 1 and 2), it is the same as the ``search_range`` we told
+``link_df()`` to use, because those particles were successfully linked.
+
+``diag_search_range`` would be a nearly pointless column except that it
+reveals the workings of adaptive search when that feature is turned on.
+See the tutorial on adaptive search for a more meaningful look at
+``diag_search_range``.
+
+``diag_remembered``
+~~~~~~~~~~~~~~~~~~~
+
+When a particle seems to disappear, ``memory`` allows its "ghost" to
+stick around for a few more frames in case that particle reappears. In
+that event, the ``diag_remembered`` column records the number of frames
+for which the particle was missing. Let's look in the 4th frame to see
+whether this actually happened. Again, we show just the first 5 entires
+and transpose to fit on the page:
+
+.. code:: python
+
+    remembered_frame3 = t[(t.frame == 3) & (t.diag_remembered > 0)]
+    
+    print(len(remembered_frame3), 'remembered particles in frame number 3.')
+    remembered_frame3.head().T
+
+.. parsed-literal::
+
+    6 remembered particles in frame number 3.
+
+
+
+
+.. raw:: html
+
+    <div style="max-height:1000px;max-width:1500px;overflow:auto;">
+    <table border="1" class="dataframe">
+      <thead>
+        <tr style="text-align: right;">
+          <th></th>
+          <th>15</th>
+          <th>54</th>
+          <th>684</th>
+          <th>1062</th>
+          <th>1753</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>x</th>
+          <td>   275.6707</td>
+          <td>   122.9928</td>
+          <td>   263.8891</td>
+          <td>   296.0939</td>
+          <td>    329.874</td>
+        </tr>
+        <tr>
+          <th>y</th>
+          <td>   7.843685</td>
+          <td>   14.99186</td>
+          <td>   167.9982</td>
+          <td>   249.6216</td>
+          <td>   51.09198</td>
+        </tr>
+        <tr>
+          <th>mass</th>
+          <td>       2399</td>
+          <td>       2212</td>
+          <td>       2173</td>
+          <td>       2738</td>
+          <td>       2707</td>
+        </tr>
+        <tr>
+          <th>size</th>
+          <td>   2.875998</td>
+          <td>   3.393431</td>
+          <td>   3.399264</td>
+          <td>   3.222399</td>
+          <td>   3.466767</td>
+        </tr>
+        <tr>
+          <th>ecc</th>
+          <td>  0.2319915</td>
+          <td>  0.1556412</td>
+          <td> 0.04222345</td>
+          <td> 0.07553068</td>
+          <td> 0.05677761</td>
+        </tr>
+        <tr>
+          <th>signal</th>
+          <td>  -125.4135</td>
+          <td>  -111.4135</td>
+          <td>  -106.4135</td>
+          <td>  -125.4135</td>
+          <td>  -100.4135</td>
+        </tr>
+        <tr>
+          <th>ep</th>
+          <td>-0.01908911</td>
+          <td>-0.01611284</td>
+          <td>-0.01682275</td>
+          <td>-0.01560399</td>
+          <td>-0.01727066</td>
+        </tr>
+        <tr>
+          <th>frame</th>
+          <td>          3</td>
+          <td>          3</td>
+          <td>          3</td>
+          <td>          3</td>
+          <td>          3</td>
+        </tr>
+        <tr>
+          <th>particle</th>
+          <td>          4</td>
+          <td>         15</td>
+          <td>        179</td>
+          <td>        278</td>
+          <td>        459</td>
+        </tr>
+        <tr>
+          <th>diag_search_range</th>
+          <td>         13</td>
+          <td>         13</td>
+          <td>         13</td>
+          <td>         13</td>
+          <td>         13</td>
+        </tr>
+        <tr>
+          <th>diag_subnet</th>
+          <td>        NaN</td>
+          <td>        NaN</td>
+          <td>        NaN</td>
+          <td>         99</td>
+          <td>        103</td>
+        </tr>
+        <tr>
+          <th>diag_subnet_iterations</th>
+          <td>        NaN</td>
+          <td>        NaN</td>
+          <td>        NaN</td>
+          <td>          3</td>
+          <td>          7</td>
+        </tr>
+        <tr>
+          <th>diag_subnet_size</th>
+          <td>        NaN</td>
+          <td>        NaN</td>
+          <td>        NaN</td>
+          <td>          2</td>
+          <td>          4</td>
+        </tr>
+        <tr>
+          <th>diag_remembered</th>
+          <td>          1</td>
+          <td>          1</td>
+          <td>          1</td>
+          <td>          2</td>
+          <td>          1</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+
+
+One of these particles has a ``diag_remembered`` value of 2, which means
+that it was present in the first frame, went missing for 2 frames, and
+then seemingly reappeared in the fourth frame.
+
+If you are not sure whether memory (or a specific value of the
+``memory`` option) is appropriate for your movie, ``diag_remembered``
+shows you which trajectories and frames to spot-check.
+
+``diag_subnet``
+~~~~~~~~~~~~~~~
+
+As you may have also learned in other ``trackpy`` tutorials (including
+the one devoted to the topic), how easily subnetworks arise, and how
+they are resolved, can be crucial to the feasibility and correctness of
+linking. ``trackpy`` records diagnostic data whenever it encounters a
+subnetwork. (If there were no subnetworks at all, the columns discussed
+here will not be present.) As with memory, these data can help you focus
+on potential trouble spots.
+
+In our example data, we can see what subnetworks were encountered when
+linking frames 0 and 1:
+
+.. code:: python
+
+    subnet_particles = t[(t.frame == 1) & ~(t.diag_subnet.isnull())]
+    
+    print(len(subnet_particles), 'particles involved in subnets between frames 0 and 1.')
+    subnet_particles.head().T
+
+.. parsed-literal::
+
+    66 particles involved in subnets between frames 0 and 1.
+
+
+
+
+.. raw:: html
+
+    <div style="max-height:1000px;max-width:1500px;overflow:auto;">
+    <table border="1" class="dataframe">
+      <thead>
+        <tr style="text-align: right;">
+          <th></th>
+          <th>32</th>
+          <th>40</th>
+          <th>210</th>
+          <th>218</th>
+          <th>263</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>x</th>
+          <td>   540.9631</td>
+          <td>   552.7497</td>
+          <td>    20.6954</td>
+          <td>   339.6487</td>
+          <td>   346.1563</td>
+        </tr>
+        <tr>
+          <th>y</th>
+          <td>   8.498964</td>
+          <td>   11.44873</td>
+          <td>   54.82698</td>
+          <td>   56.97173</td>
+          <td>   67.19563</td>
+        </tr>
+        <tr>
+          <th>mass</th>
+          <td>       2896</td>
+          <td>       3160</td>
+          <td>       4803</td>
+          <td>       3077</td>
+          <td>       2469</td>
+        </tr>
+        <tr>
+          <th>size</th>
+          <td>   2.882721</td>
+          <td>   2.319087</td>
+          <td>   3.103194</td>
+          <td>   3.017014</td>
+          <td>   2.577043</td>
+        </tr>
+        <tr>
+          <th>ecc</th>
+          <td> 0.04712119</td>
+          <td> 0.05773689</td>
+          <td>  0.1552015</td>
+          <td>  0.1415368</td>
+          <td>  0.1224707</td>
+        </tr>
+        <tr>
+          <th>signal</th>
+          <td>  -125.4201</td>
+          <td>   44.57995</td>
+          <td>  -100.4201</td>
+          <td>  -125.4201</td>
+          <td>  -125.4201</td>
+        </tr>
+        <tr>
+          <th>ep</th>
+          <td>-0.01882312</td>
+          <td> 0.08029512</td>
+          <td>-0.02059843</td>
+          <td>-0.01733468</td>
+          <td>-0.02324033</td>
+        </tr>
+        <tr>
+          <th>frame</th>
+          <td>          1</td>
+          <td>          1</td>
+          <td>          1</td>
+          <td>          1</td>
+          <td>          1</td>
+        </tr>
+        <tr>
+          <th>particle</th>
+          <td>          9</td>
+          <td>         11</td>
+          <td>         56</td>
+          <td>         58</td>
+          <td>         70</td>
+        </tr>
+        <tr>
+          <th>diag_search_range</th>
+          <td>         13</td>
+          <td>         13</td>
+          <td>         13</td>
+          <td>         13</td>
+          <td>         13</td>
+        </tr>
+        <tr>
+          <th>diag_subnet</th>
+          <td>         13</td>
+          <td>         13</td>
+          <td>         15</td>
+          <td>         14</td>
+          <td>         14</td>
+        </tr>
+        <tr>
+          <th>diag_subnet_iterations</th>
+          <td>          3</td>
+          <td>          3</td>
+          <td>          1</td>
+          <td>          3</td>
+          <td>          3</td>
+        </tr>
+        <tr>
+          <th>diag_subnet_size</th>
+          <td>          2</td>
+          <td>          2</td>
+          <td>          1</td>
+          <td>          2</td>
+          <td>          2</td>
+        </tr>
+        <tr>
+          <th>diag_remembered</th>
+          <td>        NaN</td>
+          <td>        NaN</td>
+          <td>        NaN</td>
+          <td>        NaN</td>
+          <td>        NaN</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+
+
+The subnet columns are as follows:
+
+**``diag_subnet``** sequentially numbers each subnet as it is
+encountered. This allows you to count subnets, and identify particles
+that are in the same subnet. Note that the numbering is sequential over
+the *entire movie*. Therefore, to count the subnets in a particular
+frame, use
+
+.. code:: python
+
+    len(subnet_particles.diag_subnet.unique())
+
+
+
+.. parsed-literal::
+
+    33
+
+
+
+We can also take this opportunity to show these subnet particles. This
+would be the starting point for more in-depth spot checks of how subnets
+were solved.
+
+.. code:: python
+
+    tp.annotate(subnet_particles, frames[1], plot_style={'markersize': 10});
+
+
+.. image:: linking-diagnostics_files/linking-diagnostics_20_0.png
+
+
+Like ``diag_subnet``, the columns ``diag_subnet_size`` and
+``diag_subnet_iterations`` also pertain to the entire subnet; all
+members of a subnet have the same values. It would be nice to
+consolidate these data into a shorter table of the subnets and their
+properties. To do this, we can use the powerful grouping and aggregation
+features of Pandas:
+
+.. code:: python
+
+    subnets = subnet_particles.groupby('diag_subnet')[['diag_subnet_size', 'diag_subnet_iterations']].first()
+    
+    # Count how many particles in the *present* frame are in each subnet,
+    # and include it in the results.
+    subnet_current_sizes = subnet_particles.diag_subnet.value_counts()
+    subnet_current_sizes.name = 'current_size'
+    subnets = subnets.join(subnet_current_sizes)
+    
+    subnets.head()
+
+
+
+.. raw:: html
+
+    <div style="max-height:1000px;max-width:1500px;overflow:auto;">
+    <table border="1" class="dataframe">
+      <thead>
+        <tr style="text-align: right;">
+          <th></th>
+          <th>diag_subnet_size</th>
+          <th>diag_subnet_iterations</th>
+          <th>current_size</th>
+        </tr>
+        <tr>
+          <th>diag_subnet</th>
+          <th></th>
+          <th></th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>0</th>
+          <td> 2</td>
+          <td>  3</td>
+          <td> 2</td>
+        </tr>
+        <tr>
+          <th>1</th>
+          <td> 1</td>
+          <td>  1</td>
+          <td> 2</td>
+        </tr>
+        <tr>
+          <th>2</th>
+          <td> 2</td>
+          <td>  3</td>
+          <td> 2</td>
+        </tr>
+        <tr>
+          <th>3</th>
+          <td> 2</td>
+          <td>  3</td>
+          <td> 2</td>
+        </tr>
+        <tr>
+          <th>4</th>
+          <td> 3</td>
+          <td> 21</td>
+          <td> 2</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+
+
+Each subnet involves a set of trajectories in the past (generally the
+previous frame), and a set of candidate particles in the present (the
+frame in which the diagnostic info was recorded).
+**``diag_subnet_size``** gives the number of particles in the past, and
+in this example, we computed the ``current_size`` column to see the
+number in the present. You can see that some subnets necessitated the
+ending of a trajectory (e.g. 3 particles to 2), while others required
+creation (e.g. 1 to 2).
+
+Finally, the **``diag_subnet_iterations``** column counts the number of
+possible solutions that were explored by the subnet-solving algorithm
+before it decided which was best. It is therefore roughly proportional
+to the time spent solving each subnet. These data are recorded by the
+numba linker only (``link_strategy='numba'``), which is used by default
+if ``numba`` is installed. Almost all of the subnets we're examining are
+small and were solved quickly:
+
+.. code:: python
+
+    subnets.diag_subnet_iterations.hist()
+    xlabel('Time to solve subnet (arbitrary units)')
+    ylabel('Number of occurrences');
+
+
+.. image:: linking-diagnostics_files/linking-diagnostics_24_0.png
+
+
+However, a subnet of :math:`\sim` 25 particles can easily take
+:math:`10^9` iterations or more to solve.
+

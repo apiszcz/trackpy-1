@@ -1,0 +1,924 @@
+
+Walkthrough
+===========
+
+This notebook follows an example project from start to finish. We take
+video of micron-sized particles diffusing in water, track them, and
+analyze the trajectories to obtain the viscosity of water.
+
+At the bottom of the notebook, we very briefly survey the more advanced
+features of trackpy. Browse the `full list of example
+notebooks <http://nbviewer.ipython.org/github/soft-matter/trackpy-examples/tree/master/notebooks/>`__
+to learn more.
+
+Scientific IPython Setup
+------------------------
+
+We need Python's plotting library, matplotlib. Your environment might
+load matplotlib automatically, but for this tutorial I'll load it
+explicitly using this convention. If you are unfamiliar with matplotlib,
+do the same as I do here, and everything that follows will work without
+modification.
+
+.. code:: python
+
+    %matplotlib inline
+    import matplotlib as mpl
+    import matplotlib.pyplot as plt
+    
+    # Optionally, tweak styles.
+    mpl.rc('figure',  figsize=(10, 6))
+    mpl.rc('image', cmap='gray')
+We also might want to use scientific Python libraries. Finally, we'll
+import ``trackpy`` itself and its sister project, ``pims``.
+
+.. code:: python
+
+    import numpy as np
+    import pandas as pd
+    from pandas import DataFrame, Series  # for convenience
+    
+    import pims
+    import trackpy as tp
+We use the alias ``tp`` for brevity.
+
+Step 1: Read the Data
+---------------------
+
+Opening images or video
+~~~~~~~~~~~~~~~~~~~~~~~
+
+To get our data into Python, we use our sister project,
+`PIMS <https://github.com/soft-matter/pims>`__ (Python Image Sequence).
+PIMS makes is easy and convenient to load and process video data from
+many formats with one consistent interface.
+
+You can read in: \* a directory of sequential images using
+``ImageSequence`` \* a multi-frame TIFF file using ``TiffStack`` \* a
+video (AVI, MOV, etc.) using ``Video`` \* specialty formats used in
+microscopy and scientific video capture: \* ``Cine`` \* ``LSM``
+
+``ImageSequence`` works out of the box, so we recommended trying that to
+start. The others require some extra dependencies. See the README page.
+
+.. code:: python
+
+    frames = pims.ImageSequence('../sample_data/bulk_water/*.png', as_grey=True)
+.. code:: python
+
+    frames
+
+
+
+.. parsed-literal::
+
+    <Frames>
+    Source: /Users/danielallan/Documents/Repos/trackpy-examples/sample_data/bulk_water/*.png
+    Length: 300 frames
+    Frame Shape: 424 x 640
+    Pixel Datatype: uint8
+
+
+
+We can access any frame like ``frames[frame_number]``. The image is
+represented as a numpy array of intensities.
+
+.. code:: python
+
+    print frames[0]  # the first frame
+
+.. parsed-literal::
+
+    [[124 124 124 ..., 119 120 121]
+     [124 124 124 ..., 119 121 121]
+     [124 124 123 ..., 120 122 123]
+     ..., 
+     [125 126 125 ..., 107  97  96]
+     [125 125 124 ..., 115 108 105]
+     [125 125 124 ..., 123 118 116]]
+
+
+.. code:: python
+
+    frames[0]
+
+
+
+.. image:: walkthrough_files/walkthrough_13_0.png
+
+
+
+Frames behave like numpy arrays with a few extra properties.
+
+.. code:: python
+
+    frames[123].frame_no
+
+
+
+.. parsed-literal::
+
+    123
+
+
+
+.. code:: python
+
+    frames[123].metadata  # Scientific formats can pass experiment meta data here.
+
+
+
+.. parsed-literal::
+
+    {}
+
+
+
+Step 2: Locate Features
+-----------------------
+
+Start with just the first frame. Estimate the size of the features (in
+pixels). The size must be an odd integer, and it is better to err on the
+large side, as we'll see below. I estimate 11 pixels.
+
+.. code:: python
+
+    f = tp.locate(frames[0], 11, invert=True)
+
+.. parsed-literal::
+
+    Note: FFTW is configuring itself. This will take several seconds, but subsequent calls will run *much* faster.
+
+
+The algorithm looks for *bright* features; since my features are dark, I
+set ``invert=True``.
+
+``locate`` returns a spreadsheet-like object called a DataFrame. It
+lists
+
+-  each feature's position,
+-  various characterizations of its appearance, which we will use to
+   filter out spurious features,
+-  the "signal" strength and an estimate of uncertainty, both derived
+   from this paper
+
+You can read more about DataFrames in the `pandas
+documentation <pandas.pydata.org/pandas-docs/stable/>`__. They can
+easily be exported to formats like CSV, Excel, SQL, HDF5, etc.
+
+.. code:: python
+
+    f.head() # shows the first few rows of data
+
+
+
+.. raw:: html
+
+    <div style="max-height:1000px;max-width:1500px;overflow:auto;">
+    <table border="1" class="dataframe">
+      <thead>
+        <tr style="text-align: right;">
+          <th></th>
+          <th>x</th>
+          <th>y</th>
+          <th>mass</th>
+          <th>size</th>
+          <th>ecc</th>
+          <th>signal</th>
+          <th>ep</th>
+          <th>frame</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>0</th>
+          <td> 281.509343</td>
+          <td>  3.413149</td>
+          <td> 1445</td>
+          <td> 3.879411</td>
+          <td> 0.641666</td>
+          <td>-125.555015</td>
+          <td>-0.011513</td>
+          <td> 0</td>
+        </tr>
+        <tr>
+          <th>1</th>
+          <td> 552.871802</td>
+          <td> 11.106789</td>
+          <td> 3830</td>
+          <td> 2.409403</td>
+          <td> 0.130888</td>
+          <td>  66.444985</td>
+          <td> 0.049872</td>
+          <td> 0</td>
+        </tr>
+        <tr>
+          <th>2</th>
+          <td> 300.626322</td>
+          <td>  5.696044</td>
+          <td> 2553</td>
+          <td> 3.608320</td>
+          <td> 0.290576</td>
+          <td>-125.555015</td>
+          <td>-0.012818</td>
+          <td> 0</td>
+        </tr>
+        <tr>
+          <th>3</th>
+          <td> 341.992829</td>
+          <td>  6.598912</td>
+          <td> 4044</td>
+          <td> 3.639240</td>
+          <td> 0.350485</td>
+          <td>-125.555015</td>
+          <td>-0.012651</td>
+          <td> 0</td>
+        </tr>
+        <tr>
+          <th>4</th>
+          <td>  36.036426</td>
+          <td>  8.142955</td>
+          <td> 4365</td>
+          <td> 2.927963</td>
+          <td> 0.116840</td>
+          <td>-108.555015</td>
+          <td>-0.021092</td>
+          <td> 0</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+
+
+.. code:: python
+
+    tp.annotate(f, frames[0])
+
+
+.. image:: walkthrough_files/walkthrough_21_0.png
+
+
+
+
+.. parsed-literal::
+
+    <matplotlib.axes._subplots.AxesSubplot at 0x11a6a7990>
+
+
+
+Refine parameters to elminate spurious features
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Many of these circles are clearly wrong; they are fleeting peaks in
+brightness that aren't actually particles. There are many ways to
+distinguish real particles from spurrious ones. The most important way
+is to look at total brightness ("mass").
+
+.. code:: python
+
+    ax = f['mass'].hist()
+    
+    # Optionally, label the axes.
+    ax.set(xlabel='mass', ylabel='count')
+
+
+
+.. parsed-literal::
+
+    [<matplotlib.text.Text at 0x119be1250>, <matplotlib.text.Text at 0x11a6a7210>]
+
+
+
+
+.. image:: walkthrough_files/walkthrough_23_1.png
+
+
+.. code:: python
+
+    f = tp.locate(frames[0], 11, invert=True, minmass=2000)
+.. code:: python
+
+    tp.annotate(f, frames[0])
+
+
+.. image:: walkthrough_files/walkthrough_25_0.png
+
+
+
+
+.. parsed-literal::
+
+    <matplotlib.axes._subplots.AxesSubplot at 0x11caccb10>
+
+
+
+There are more options for controling and optimizing feature-finding.
+You can review them in the
+`documentation <https://trackpy.readthedocs.org/en/latest/reference/trackpy.feature.html>`__.
+Or, pull them up as you work by typing ``tp.locate?`` into IPython.
+
+Check for subpixel accuracy
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+As Eric Weeks points out in his related tutorial, a quick way to check
+for subpixel accuracy is to check that the decimal part of the x and/or
+y positions are evenly distributed. Trackpy provides a convenience
+plotting function for this:
+
+.. code:: python
+
+    tp.subpx_bias(f)
+
+
+.. image:: walkthrough_files/walkthrough_28_0.png
+
+
+
+
+.. parsed-literal::
+
+    <matplotlib.axes._subplots.AxesSubplot at 0x11b217810>
+
+
+
+If we use a mask size that is too small, the histogram often shows a dip
+in the middle.
+
+.. code:: python
+
+    tp.subpx_bias(tp.locate(frames[0], 7, invert=True))
+
+
+.. image:: walkthrough_files/walkthrough_30_0.png
+
+
+
+
+.. parsed-literal::
+
+    <matplotlib.axes._subplots.AxesSubplot at 0x11aa27950>
+
+
+
+Locate features in all frames
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Or, to start, just explore a subset of the frames.
+
++-----------------------------+---------------------------------------+
+| selection                   | syntax example                        |
++=============================+=======================================+
+| all the frames              | ``frames[:]`` or simply ``frames``.   |
++-----------------------------+---------------------------------------+
+| the first 10 frames         | ``frames[:10]``                       |
++-----------------------------+---------------------------------------+
+| the last 10 frames          | ``frames[-10:]``                      |
++-----------------------------+---------------------------------------+
+| a range of frames           | ``frames[100:200]``                   |
++-----------------------------+---------------------------------------+
+| every 10th frame            | ``frame[::10]``                       |
++-----------------------------+---------------------------------------+
+| a list of specific frames   | ``frames[[100, 107, 113]]``           |
++-----------------------------+---------------------------------------+
+
+We'll locate features in the first 300 frames from this video. We use
+``tp.batch``, which calls ``tp.locate`` on each frame and collects the
+results.
+
+.. code:: python
+
+    f = tp.batch(frames[:300], 11, minmass=2000, invert=True)
+
+.. parsed-literal::
+
+    Frame 299: 402 features
+
+
+As each frame is analyzed, ``tp.batch`` reports the frame number and how
+many features were found. If this number runs unexpectedly low or high,
+you may wish to interrupt it and try different parameters.
+
+Step 3: Link features into particle trajectories
+------------------------------------------------
+
+We have the locations of the particles in each frame. Next we'll track
+particles from frame to frame, giving each one a number for
+identification.
+
+First, we must must specify a maximum displacement, the farthest a
+particle can travel between frames. We should choose the smallest
+reasonable value because a large value slows computation time
+considerably. In this case, 5 pixels is reasonable.
+
+Second, we allow for the possibility that a particle might be missed for
+a few frames and then seen again. (Perhaps its "mass" slipped below our
+cutoff due to noise in the video.) Memory keeps track of disappeared
+particles and maintains their ID for up to some number of frames after
+their last appearance. We'll choose 3.
+
+.. code:: python
+
+    t = tp.link_df(f, 5, memory=3)
+
+.. parsed-literal::
+
+    Frame 299: 402 trajectories present
+
+
+The result is the features DataFrame ``f`` with an additional column,
+``particle``, identifying each feature with a label.
+
+.. code:: python
+
+    t.head()
+
+
+
+.. raw:: html
+
+    <div style="max-height:1000px;max-width:1500px;overflow:auto;">
+    <table border="1" class="dataframe">
+      <thead>
+        <tr style="text-align: right;">
+          <th></th>
+          <th>x</th>
+          <th>y</th>
+          <th>mass</th>
+          <th>size</th>
+          <th>ecc</th>
+          <th>signal</th>
+          <th>ep</th>
+          <th>frame</th>
+          <th>particle</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>0</th>
+          <td> 227.624574</td>
+          <td> 40.411627</td>
+          <td> 4696</td>
+          <td> 3.574708</td>
+          <td> 0.166794</td>
+          <td>-64.555015</td>
+          <td>-0.025293</td>
+          <td> 0</td>
+          <td> 0</td>
+        </tr>
+        <tr>
+          <th>1</th>
+          <td> 227.891466</td>
+          <td> 41.591638</td>
+          <td> 3492</td>
+          <td> 3.732270</td>
+          <td> 0.229409</td>
+          <td>-58.419679</td>
+          <td>-0.026230</td>
+          <td> 1</td>
+          <td> 0</td>
+        </tr>
+        <tr>
+          <th>2</th>
+          <td> 227.788112</td>
+          <td> 42.395982</td>
+          <td> 3634</td>
+          <td> 3.675732</td>
+          <td> 0.220305</td>
+          <td>-68.455106</td>
+          <td>-0.023443</td>
+          <td> 2</td>
+          <td> 0</td>
+        </tr>
+        <tr>
+          <th>3</th>
+          <td> 230.362327</td>
+          <td> 41.583934</td>
+          <td> 3610</td>
+          <td> 3.659012</td>
+          <td> 0.225123</td>
+          <td>-71.413400</td>
+          <td>-0.022326</td>
+          <td> 3</td>
+          <td> 0</td>
+        </tr>
+        <tr>
+          <th>4</th>
+          <td> 227.871365</td>
+          <td> 43.397195</td>
+          <td> 2923</td>
+          <td> 3.716566</td>
+          <td> 0.238247</td>
+          <td>-74.418446</td>
+          <td>-0.020592</td>
+          <td> 4</td>
+          <td> 0</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+
+
+Filter spurious trajectories.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+We have more filtering to do. Empheremeral trajectories -- seen only for
+a few frames -- are usually spurious and never useful. The convenience
+function ``filter_stubs`` keeps only trajectories that last for a given
+number of frames.
+
+.. code:: python
+
+    t1 = tp.filter_stubs(t, 50)
+    # Compare the number of particles in the unfiltered and filtered data.
+    print 'Before:', t['particle'].nunique()
+    print 'After:', t1['particle'].nunique()
+
+.. parsed-literal::
+
+    Before: 6854
+    After: 612
+
+
+We can also filter trajectories by their appearance. At this stage, with
+trajectories linked, we can look at a feature's "average appearance"
+throughout its trajectory, giving a more accurate picture.
+
+.. code:: python
+
+    tp.mass_size(t1.groupby('particle').mean())  # convenience function -- just plots size vs. mass
+
+.. parsed-literal::
+
+    i f
+
+
+
+.. image:: walkthrough_files/walkthrough_42_1.png
+
+
+
+
+.. parsed-literal::
+
+    <matplotlib.axes._subplots.AxesSubplot at 0x11a412710>
+
+
+
+The particles with especially low mass or especially large size are
+probably out of focus or aggregated, respectively. It is best to
+experiment by trial and error, filtering out regions of mass-size space
+and looking at the results using ``tp.annotate`` and ``tp.circle``. In
+the end, we need to separate the good particles from the spurious ones,
+and it doesn't matter how we get it done.
+
+.. code:: python
+
+    condition = lambda x: (x['mass'].mean() > 2800) & (x['size'].mean() < 3.0) & (x['ecc'].mean() < 0.1)
+    t2 = tp.filter(t1, condition)  # a wrapper for pandas' filter that works around a bug in v 0.12
+.. code:: python
+
+    tp.annotate(t2[t2['frame'] == 0], frames[0])
+
+
+.. image:: walkthrough_files/walkthrough_45_0.png
+
+
+
+
+.. parsed-literal::
+
+    <matplotlib.axes._subplots.AxesSubplot at 0x11eaf59d0>
+
+
+
+Trace the trajectories.
+
+.. code:: python
+
+    tp.plot_traj(t1)
+
+
+.. image:: walkthrough_files/walkthrough_47_0.png
+
+
+
+
+.. parsed-literal::
+
+    <matplotlib.axes._subplots.AxesSubplot at 0x11eac5650>
+
+
+
+Remove overall drift
+~~~~~~~~~~~~~~~~~~~~
+
+Compute the overall drifting motion, which we will subtract away,
+adopting the reference frame of the particles' average position.
+
+.. code:: python
+
+    d = tp.compute_drift(t1)
+.. code:: python
+
+    d.plot()
+
+
+
+.. parsed-literal::
+
+    <matplotlib.axes._subplots.AxesSubplot at 0x11a1198d0>
+
+
+
+
+.. image:: walkthrough_files/walkthrough_50_1.png
+
+
+.. code:: python
+
+    tm = tp.subtract_drift(t1, d)
+With the overall drifting motion subtracted out, we plot the
+trajectories again. We observe nice random walks.
+
+.. code:: python
+
+    tp.plot_traj(tm)
+
+
+.. image:: walkthrough_files/walkthrough_53_0.png
+
+
+
+
+.. parsed-literal::
+
+    <matplotlib.axes._subplots.AxesSubplot at 0x11fe77590>
+
+
+
+Step 4: Analyze trajectories
+----------------------------
+
+Mean Squared Displacement of Individal Probes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Compute the mean squared displacement of each particle and plot MSD vs.
+lag time.
+
+.. code:: python
+
+    im = tp.imsd(tm, 100/285., 24)  # microns per pixel = 100/285., frames per second = 24
+.. code:: python
+
+    im.plot(loglog=True, style='k-', alpha=0.1, legend=False)  # black lines, semitransparent, no legend
+    plt.gca().set_ylabel(r'$\langle \Delta r^2 \rangle$ [$\mu$m$^2$]');
+
+
+.. image:: walkthrough_files/walkthrough_57_0.png
+
+
+Since we only analyzed 300 frames, the statistics are poor at large lag
+times. With more frames, we can study larger lag times.
+
+Ensemble Mean Squared Displacement
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    em = tp.emsd(tm, 100/285., 24)
+
+.. parsed-literal::
+
+    f f
+
+
+.. code:: python
+
+    ax = em.plot(loglog=True, style='o')
+    ax.set(ylabel=r'$\langle \Delta r^2 \rangle$ [$\mu$m$^2$]', xlabel='lag time $t$')
+    ax.set(ylim=(1e-2, 10))
+
+
+
+.. parsed-literal::
+
+    [(0.01, 10)]
+
+
+
+
+.. image:: walkthrough_files/walkthrough_60_1.png
+
+
+We can easily fit this to a power law using a convenience function,
+``fit_powerlaw``, that performs a linear regression in log space.
+
+.. code:: python
+
+    em.plot(loglog=True, style='ro')
+    tp.utils.fit_powerlaw(em)
+
+
+.. image:: walkthrough_files/walkthrough_62_0.png
+
+
+
+
+.. raw:: html
+
+    <div style="max-height:1000px;max-width:1500px;overflow:auto;">
+    <table border="1" class="dataframe">
+      <thead>
+        <tr style="text-align: right;">
+          <th></th>
+          <th>n</th>
+          <th>A</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>msd</th>
+          <td> 0.955968</td>
+          <td> 1.660323</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+
+
+In water, a viscous material, the expected power-law exponent
+:math:`n = 1`. The value of :math:`A = 4D`, where :math:`D` is the
+particles' diffusivity. :math:`D` is related to viscosity :math:`\eta`,
+particle radius :math:`a`, and temperature :math:`T` as
+
+:math:`D = \displaystyle\frac{kT}{6\pi\eta a}`.
+
+For paritcles with a 1 :math:`\mu\text{m}` diameter in room-temperature
+water, :math:`A \approx 1.74`. Our value above is not far off.
+
+**This is the end of the walkthrough. Keep reading to review the more
+advanced capabilities in trackpy.**
+
+Preview of Advanced Features
+----------------------------
+
+These are covered in greater detail in later tutorials.
+
+Streaming
+---------
+
+The feature-finding and trajectory-linking functions ``batch`` and
+``link_df`` keep all of their results in memory. This approach is
+simple, but it isn't necessary. We can prcoess an unlimited number of
+frames if we save the results as we go.
+
+Trackpy includes a class to manage storing an retrieving data framewise
+in an HDF5 format. The general idea is easily extensive to other
+formats.
+
+.. code:: python
+
+    with tp.PandasHDFStore('data.h5') as s:
+        for frame in frames:
+            features = tp.locate(frame, 11, invert=True, minmass=2000)
+            s.put(features)
+.. code:: python
+
+    with tp.PandasHDFStore('data.h5') as s:
+        for linked in tp.link_df_iter(s, 5, memory=3):
+            s.put(linked)
+
+.. parsed-literal::
+
+    Frame 299: 402 trajectories present
+
+
+You can get results by frame with ``s.get(frame_number)`` or, when you
+have sufficient memory, retrieve them all. The results is identifical to
+what you would obtained using the basic functions ``batch`` and
+``link_df``.
+
+.. code:: python
+
+    with tp.PandasHDFStore('data.h5') as s:
+        trajectories = pd.concat(iter(s))
+Optional High Performance Components: Numba and FFTW
+----------------------------------------------------
+
+Numba
+~~~~~
+
+The core, time-consuming steps in particle location and linking are
+implemented in Python/numpy and also in pure Python optimized for numba.
+If numba is installed, trackpy will detect it and use it by default. You
+can switch it on and off to compare performance.
+
+.. code:: python
+
+    %timeit tp.batch(frames[:10], 11, invert=True, minmass=2000, engine='numba')
+
+.. parsed-literal::
+
+    Frame 9: 362 features
+    1 loops, best of 3: 4.34 s per loop
+
+
+.. code:: python
+
+    %timeit tp.batch(frames[:10], 11, invert=True, minmass=2000, engine='python')
+
+.. parsed-literal::
+
+    Frame 9: 353 features
+    1 loops, best of 3: 13.2 s per loop
+
+
+The linking functions ``link_df`` or ``link_df_iter`` support various
+options for ``link_strategy``, one of which is numba-based. Read the
+their docstrings for details.
+
+FFTW ("Fastest Fourier Transform in the West")
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``locate`` spends roughly half of its time performing a Fast Fourier
+Transform of the image. (This is the key step in performing a bandpass
+filter, which removes small-scale noise and large-scale variation in
+image brightness.) FFTW is a drop-in replacement for numpy's FFT. If
+trackpy can find pyFFTW, it will use it instead of ``numpy.fft``.
+
+Parellelization
+---------------
+
+Feature-finding can easily be parallelized: each frame an independent
+task, and the tasks can be divided among the available CPUs. IPython
+parallel makes this very straightforward.
+
+It is simplest to try this on the CPUs of the local machine. To do this
+from an IPython notebook, go to File > Open, and click the "Clusters"
+tab. Fill in the "engines" field with the number of available CPUs
+(e.g., 4) and click start. Now you are running a cluster -- it's that
+easy. More information on IPython parallel is available in `this section
+of the IPython
+documentation <http://ipython.org/ipython-doc/stable/parallel/>`__.
+
+.. code:: python
+
+    from IPython import parallel
+    from IPython.display import display
+    
+    client = parallel.Client()
+    view = client.load_balanced_view()
+    
+    client[:]
+
+
+
+.. parsed-literal::
+
+    <DirectView [0, 1, 2, 3]>
+
+
+
+.. code:: python
+
+    curried_locate = lambda image: tp.locate(image, diameter=13, invert=True)
+.. code:: python
+
+    %%px
+    
+    import trackpy as tp
+.. code:: python
+
+    view.map(curried_locate, frames[:4])  # Optionally, prime each engine: make it set up FFTW.
+
+
+
+.. parsed-literal::
+
+    <AsyncMapResult: <lambda>>
+
+
+
+.. code:: python
+
+    amr = view.map_async(curried_locate, frames[:32])
+    amr.wait_interactive()
+
+.. parsed-literal::
+
+      32/32 tasks finished after    6 s
+    done
+
+
+.. code:: python
+
+    %time serial_result = map(curried_locate, frames[:32])
+
+.. parsed-literal::
+
+    CPU times: user 13 s, sys: 602 ms, total: 13.6 s
+    Wall time: 13.6 s
+

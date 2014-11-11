@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Adaptive Search: Changing search_range on the Fly &mdash; trackpy 0.2.3-169-gd1aa128 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/bootswatch-3.2.0/spacelab/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.2.3-169-gd1aa128',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-3.2.0/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="trackpy 0.2.3-169-gd1aa128 documentation" href="../index.html" />
+    <link rel="next" title="Streaming: Processing Unlimited Frames On-Disk" href="on-disk.html" />
+    <link rel="prev" title="Advanced Linking: Subnetworks and search_range" href="subnets.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html">
+          trackpy</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.2.3-169-gd1aa128</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../tutorial.html">Tutorial</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Introduction to Trackpy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installing Trackpy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html#updating-your-installation">Updating Your Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../whatsnew.html">What&#8217;s new in the package</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="walkthrough.html">Walkthrough</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prediction.html">Prediction: Beyond Simple Random Walks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tracking-3d.html">Feature finding in 3D confocal images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="uncertainty.html">Subpixel Accuracy and Uncertainty Estimation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="subnets.html">Advanced Linking: Subnetworks and <tt class="docutils literal"><span class="pre">search_range</span></tt></a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">Adaptive Search: Changing <tt class="docutils literal"><span class="pre">search_range</span></tt> on the Fly</a></li>
+<li class="toctree-l1"><a class="reference internal" href="on-disk.html">Streaming: Processing Unlimited Frames On-Disk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="performance.html">Making trackpy fast(er)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="linking-diagnostics.html">Obtaining Diagnostic Information from Linking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parallel-locate.html">Parallelized Feature Location using IPython Parallel</a></li>
+<li class="toctree-l1"><a class="reference internal" href="custom-feature-detection.html">Custom Feature Detection: Bubble tracking in 2D foams</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">Adaptive Search: Changing <tt class="docutils literal"><span class="pre">search_range</span></tt> on the Fly</a><ul>
+<li><a class="reference internal" href="#how-it-works">How it works</a></li>
+<li><a class="reference internal" href="#how-to-use-it">How to use it</a><ul>
+<li><a class="reference internal" href="#the-maximum-subnet-size-and-a-word-of-caution">The maximum subnet size, and a word of caution</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#example">Example</a><ul>
+<li><a class="reference internal" href="#linking-without-adaptive-search">Linking without adaptive search</a></li>
+<li><a class="reference internal" href="#linking-with-adaptive-search">Linking with adaptive search</a></li>
+<li><a class="reference internal" href="#seeing-adaptive-search-at-work">Seeing adaptive search at work</a></li>
+<li><a class="reference internal" href="#a-final-note">A final note</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      
+  <div class="section" id="adaptive-search-changing-search-range-on-the-fly">
+<h1>Adaptive Search: Changing <tt class="docutils literal"><span class="pre">search_range</span></tt> on the Fly<a class="headerlink" href="#adaptive-search-changing-search-range-on-the-fly" title="Permalink to this headline">¶</a></h1>
+<p>As discussed in the tutorial on &#8220;Advanced Linking,&#8221; a basic limitation
+of the tracking algorithm involves the selection of <tt class="docutils literal"><span class="pre">search_range</span></tt>. If
+it is too small, many valid trajectories will be unlinked or linked
+incorrectly. If it is too large, <tt class="docutils literal"><span class="pre">trackpy</span></tt> will become overwhelmed
+with candidate features, and will either be bogged down by those
+possibilities or will give up entirely, raising a
+<tt class="docutils literal"><span class="pre">SubnetOversizeException</span></tt>.</p>
+<p>The tutorial on &#8220;Advanced Linking&#8221; identifies some ways to ease this
+dilemma, including prediction, which lets <tt class="docutils literal"><span class="pre">trackpy</span></tt> select candidate
+features more intelligently. Still, &#8220;perfect&#8221; tracking is often
+computationally impossible. One is then faced with the task of finding a
+<tt class="docutils literal"><span class="pre">search_range</span></tt> that allows linking to finish in a reasonable amount of
+time while merely <em>minimizing</em> linking errors. The usual method for
+optimizing <tt class="docutils literal"><span class="pre">search_range</span></tt> is to repeatedly adjust it and run the
+linker, searching for the largest value that does not halt or
+intolerably slow the algorithm. This search can be time-consuming and
+frustrating, especially for long movies. Perhaps worse, one must choose
+the <tt class="docutils literal"><span class="pre">search_range</span></tt> for all particles in all frames, even if the
+failure is being caused by a single large subnet spanning just two
+successive frames.</p>
+<p>This difficulty is addressed by the &#8220;adaptive search&#8221; functionality that
+is built into <tt class="docutils literal"><span class="pre">trackpy</span></tt> starting with version 0.3. Instead of
+specifying a single <tt class="docutils literal"><span class="pre">search_range</span></tt> for all particles in all frames,
+one gives <tt class="docutils literal"><span class="pre">trackpy</span></tt> a <em>maximum</em> value. <tt class="docutils literal"><span class="pre">trackpy</span></tt> then automatically
+reduces <tt class="docutils literal"><span class="pre">search_range</span></tt> <em>only</em> when and where it encounters difficulty.</p>
+<div class="section" id="how-it-works">
+<h2>How it works<a class="headerlink" href="#how-it-works" title="Permalink to this headline">¶</a></h2>
+<p>When it encounters a large subnet, the algorithm repeatedly attempts to
+link <em>only those particles</em>, using smaller and smaller values of
+<tt class="docutils literal"><span class="pre">search_range</span></tt>. As <tt class="docutils literal"><span class="pre">search_range</span></tt> is reduced, some of the possible
+track assignments are eliminated from consideration. The original large
+subnet is thereby broken up into smaller pieces, some of which may be
+small enough to solve directly (by considering all possible track
+assignments). This process continues until no oversize subnet(s) remain,
+or a minimum <tt class="docutils literal"><span class="pre">search_range</span></tt> is reached. In the latter case, a
+<tt class="docutils literal"><span class="pre">SubnetOversizeException</span></tt> is raised and linking is aborted.</p>
+</div>
+<div class="section" id="how-to-use-it">
+<h2>How to use it<a class="headerlink" href="#how-to-use-it" title="Permalink to this headline">¶</a></h2>
+<p>To any of the <tt class="docutils literal"><span class="pre">link</span></tt> family of functions, supply the <tt class="docutils literal"><span class="pre">search_range</span></tt>
+argument as usual, along with an <tt class="docutils literal"><span class="pre">adaptive_stop</span></tt> argument, and
+optionally an <tt class="docutils literal"><span class="pre">adaptive_step</span></tt>. When <tt class="docutils literal"><span class="pre">trackpy</span></tt> encounters a large
+subnet, it will locally reduce <tt class="docutils literal"><span class="pre">search_range</span></tt> by multiplying it by
+<tt class="docutils literal"><span class="pre">adaptive_step</span></tt>. (<tt class="docutils literal"><span class="pre">adaptive_step</span></tt> must be greater than 0 and less
+than 1; the default is 0.95.) This multiplication will be applied
+repeatedly if necessary. <tt class="docutils literal"><span class="pre">adaptive_stop</span></tt> (note the single-letter
+difference!) tells <tt class="docutils literal"><span class="pre">trackpy</span></tt> when to give up. When <tt class="docutils literal"><span class="pre">search_range</span></tt>
+has become less than or equal to <tt class="docutils literal"><span class="pre">adaptive_stop</span></tt>, <tt class="docutils literal"><span class="pre">trackpy</span></tt> aborts
+linking by raising a <tt class="docutils literal"><span class="pre">SubnetOversizeException</span></tt>.</p>
+<p>For example, at the high end, you might consider 10.0 to be a generous
+but reasonable <tt class="docutils literal"><span class="pre">search_range</span></tt> for your movie. At the low end, you feel
+that a <tt class="docutils literal"><span class="pre">search_range</span></tt> of 2.0 — the radius of one of your particles —
+is unreasonably small and would be a sure sign of trouble. Finally, you
+decide that <tt class="docutils literal"><span class="pre">search_range</span></tt> should be reduced carefully — just 5% at a
+time. The values you should specify are then</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="p">{</span><span class="s">&#39;search_range&#39;</span><span class="p">:</span> <span class="mf">10.0</span><span class="p">,</span>
+ <span class="s">&#39;adaptive_stop&#39;</span><span class="p">:</span> <span class="mf">2.0</span><span class="p">,</span>
+ <span class="s">&#39;adaptive_step&#39;</span><span class="p">:</span> <span class="mf">0.95</span><span class="p">}</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span><span class="s">&#39;adaptive_step&#39;</span><span class="p">:</span> <span class="mf">0.95</span><span class="p">,</span> <span class="s">&#39;adaptive_stop&#39;</span><span class="p">:</span> <span class="mf">2.0</span><span class="p">,</span> <span class="s">&#39;search_range&#39;</span><span class="p">:</span> <span class="mf">10.0</span><span class="p">}</span>
+</pre></div>
+</div>
+<div class="section" id="the-maximum-subnet-size-and-a-word-of-caution">
+<h3>The maximum subnet size, and a word of caution<a class="headerlink" href="#the-maximum-subnet-size-and-a-word-of-caution" title="Permalink to this headline">¶</a></h3>
+<p>There is one more parameter that you <em>may</em> wish to adjust, but the
+reason is a little technical.</p>
+<p>Under normal circumstances, if you have a movie that does <em>not</em> cry out
+for adaptive search, large subnets will be rare, and to get the most
+accurate linking you will want the computer to solve them all, even ones
+that take a few minutes. This favors a default maximum subnet size,
+stored in <tt class="docutils literal"><span class="pre">trackpy.linking.Linker.MAX_SUB_NET_SIZE</span></tt>, that is rather
+generous.</p>
+<p>This situation changes when adaptive search is enabled. As it reduces
+<tt class="docutils literal"><span class="pre">search_range</span></tt>, <tt class="docutils literal"><span class="pre">trackpy</span></tt> is searching for the largest computable
+subnet(s) embedded within the original oversize, non-computable subnet.
+If you are lazy (and who isn&#8217;t?), you will want to choose a generous
+(but reasonable) maximum <tt class="docutils literal"><span class="pre">search_range</span></tt> and let <tt class="docutils literal"><span class="pre">trackpy</span></tt> do the
+hard work of optimizing it downward. The result is that <tt class="docutils literal"><span class="pre">trackpy</span></tt> will
+frequently be solving subnets that are just below the maximum size. This
+favors a <em>small</em> maximum size, corresponding to a subnet that can be
+solved in well under a second.</p>
+<p>Because a different behavior is desired in each case, there is a
+different default subnet limit for adaptive search, stored in
+<tt class="docutils literal"><span class="pre">trackpy.linking.Linker.MAX_SUB_NET_SIZE_ADAPTIVE</span></tt>. As with the
+regular default, you may wish to adjust this value depending on your
+patience and the speed of your computer.</p>
+<p>The default values in the current version of <tt class="docutils literal"><span class="pre">trackpy</span></tt> are</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">trackpy</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+
+<span class="n">trackpy</span><span class="o">.</span><span class="n">linking</span><span class="o">.</span><span class="n">Linker</span><span class="o">.</span><span class="n">MAX_SUB_NET_SIZE</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="mi">30</span>
+</pre></div>
+</div>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">trackpy</span><span class="o">.</span><span class="n">linking</span><span class="o">.</span><span class="n">Linker</span><span class="o">.</span><span class="n">MAX_SUB_NET_SIZE_ADAPTIVE</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="mi">15</span>
+</pre></div>
+</div>
+<p>Since subnet computation time scales very roughly as <span class="math">\(N!\)</span>, this is
+actually a <em>huge</em> difference in speed:</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">math</span>
+<span class="nb">float</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">factorial</span><span class="p">(</span><span class="n">trackpy</span><span class="o">.</span><span class="n">linking</span><span class="o">.</span><span class="n">Linker</span><span class="o">.</span><span class="n">MAX_SUB_NET_SIZE</span><span class="p">)</span> <span class="o">/</span> \
+    <span class="n">math</span><span class="o">.</span><span class="n">factorial</span><span class="p">(</span><span class="n">trackpy</span><span class="o">.</span><span class="n">linking</span><span class="o">.</span><span class="n">Linker</span><span class="o">.</span><span class="n">MAX_SUB_NET_SIZE_ADAPTIVE</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="mf">2.0284320493172736e+20</span>
+</pre></div>
+</div>
+<p>The difference in maximal subnet size is the primary drawback of
+adaptive search. Solving a large subnet may be slow, but at least you
+are getting the best possible set of trajectories, ones that minimize
+the total displacement over all particles. (For details, see the
+original paper by Crocker &amp; Grier, referenced in the introduction to the
+<tt class="docutils literal"><span class="pre">trackpy</span></tt> documentation.) Depending on the details of your movie, if
+you insist on solving smaller subnets you may instead get results that
+are less than fully correct.</p>
+<p><strong>In other words,</strong> adaptive search can abolish a lot of headaches,
+tedium, and gut-wrenching decisions, but it cannot magically clean up
+problematic data, and it cannot abolish the possibility of shooting
+yourself in the foot. Proceed accordingly.</p>
+</div>
+</div>
+<div class="section" id="example">
+<h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
+<p>This is a highly contrived example, but it illustrates how adaptive
+search can greatly ease the problem of choosing <tt class="docutils literal"><span class="pre">search_range</span></tt>.</p>
+<p>As example data, we define a grid of points that has contracted in the
+second frame. It is visualized below, using a function we define.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">contracting_grid</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="mf">0.95</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Two frames with a grid of 441 points.</span>
+
+<span class="sd">    In the second frame, the points contract, so that the outermost set</span>
+<span class="sd">    coincides with the second-outermost set in the previous frame.</span>
+
+<span class="sd">    This is a way to challenge (and/or stump) a subnet solver.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">pts0x</span><span class="p">,</span> <span class="n">pts0y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mgrid</span><span class="p">[</span><span class="o">-</span><span class="mi">10</span><span class="p">:</span><span class="mi">11</span><span class="p">,</span><span class="o">-</span><span class="mi">10</span><span class="p">:</span><span class="mi">11</span><span class="p">]</span>
+    <span class="n">pts0</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">pts0x</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">y</span><span class="o">=</span><span class="n">pts0y</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span>
+                             <span class="n">frame</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+    <span class="n">pts1</span> <span class="o">=</span> <span class="n">pts0</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">pts1</span><span class="o">.</span><span class="n">frame</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">pts1</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">pts1</span><span class="o">.</span><span class="n">x</span> <span class="o">*</span> <span class="n">scale</span>
+    <span class="n">pts1</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">pts1</span><span class="o">.</span><span class="n">y</span> <span class="o">*</span> <span class="n">scale</span>
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">pts0</span><span class="p">,</span> <span class="n">pts1</span><span class="p">],</span> <span class="n">ignore_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="n">cg</span> <span class="o">=</span> <span class="n">contracting_grid</span><span class="p">()</span>
+<span class="n">cg_original</span> <span class="o">=</span> <span class="n">cg</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">trshow</span><span class="p">(</span><span class="n">tr</span><span class="p">,</span> <span class="n">first_style</span><span class="o">=</span><span class="s">&#39;bo&#39;</span><span class="p">,</span> <span class="n">last_style</span><span class="o">=</span><span class="s">&#39;g.&#39;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s">&#39;b.&#39;</span><span class="p">):</span>
+    <span class="n">frames</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">tr</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">&#39;frame&#39;</span><span class="p">))</span>
+    <span class="n">nframes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">frames</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">fnum</span><span class="p">,</span> <span class="n">pts</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">frames</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">sty</span> <span class="o">=</span> <span class="n">first_style</span>
+        <span class="k">elif</span> <span class="n">i</span> <span class="o">==</span> <span class="n">nframes</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">sty</span> <span class="o">=</span> <span class="n">last_style</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sty</span> <span class="o">=</span> <span class="n">style</span>
+        <span class="n">plot</span><span class="p">(</span><span class="n">pts</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">pts</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">sty</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s">&#39;particle&#39;</span> <span class="ow">in</span> <span class="n">tr</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">pid</span> <span class="ow">in</span> <span class="n">tr</span><span class="o">.</span><span class="n">particle</span><span class="o">.</span><span class="n">unique</span><span class="p">():</span>
+            <span class="n">plot</span><span class="p">(</span><span class="n">tr</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="n">tr</span><span class="o">.</span><span class="n">particle</span> <span class="o">==</span> <span class="n">pid</span><span class="p">],</span>
+                 <span class="n">tr</span><span class="o">.</span><span class="n">y</span><span class="p">[</span><span class="n">tr</span><span class="o">.</span><span class="n">particle</span> <span class="o">==</span> <span class="n">pid</span><span class="p">],</span> <span class="s">&#39;r-&#39;</span><span class="p">)</span>
+    <span class="n">axis</span><span class="p">(</span><span class="s">&#39;equal&#39;</span><span class="p">);</span> <span class="n">ylim</span><span class="p">(</span><span class="o">-</span><span class="mi">11</span><span class="p">,</span> <span class="mi">11</span><span class="p">)</span>
+    <span class="n">xlabel</span><span class="p">(</span><span class="s">&#39;x&#39;</span><span class="p">)</span>
+    <span class="n">ylabel</span><span class="p">(</span><span class="s">&#39;y&#39;</span><span class="p">)</span>
+
+<span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">trshow</span><span class="p">(</span><span class="n">cg_original</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/adaptive-search_11_0.png" src="../_images/adaptive-search_11_0.png" />
+<p>In the preceding plot, the large blue dots are the first frame, and the
+small green dots are the second frame.</p>
+<div class="section" id="linking-without-adaptive-search">
+<h3>Linking without adaptive search<a class="headerlink" href="#linking-without-adaptive-search" title="Permalink to this headline">¶</a></h3>
+<p>Next, we perform linking with a &#8220;small&#8221; <tt class="docutils literal"><span class="pre">search_range</span></tt> of 0.65. The
+computation finishes quickly but fails to link the particles with the
+largest displacements, in the corners.</p>
+<div class="code python highlight-python"><div class="highlight"><pre>%%time
+tracks_toosmall = trackpy.link_df(cg, 0.65)
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre>Frame 1: 441 trajectories present
+CPU times: user 188 ms, sys: 7.54 ms, total: 195 ms
+Wall time: 199 ms
+</pre></div>
+</div>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">trshow</span><span class="p">(</span><span class="n">tracks_toosmall</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/adaptive-search_14_0.png" src="../_images/adaptive-search_14_0.png" />
+<p>Seeing this problem, we increase <tt class="docutils literal"><span class="pre">search_range</span></tt> to 0.8. This
+computation also finishes quickly — by raising a
+<tt class="docutils literal"><span class="pre">SubnetOversizeException</span></tt>!</p>
+<div class="code python highlight-python"><div class="highlight"><pre>%%time
+try:
+    tracks_toobig = trackpy.link_df(cg, 0.8)
+except trackpy.SubnetOversizeException:
+    print &#39;Failed!!&#39;
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre>Frame 0: 441 trajectories present
+Failed!!
+CPU times: user 21.7 ms, sys: 2.56 ms, total: 24.3 ms
+Wall time: 24 ms
+</pre></div>
+</div>
+<p>By trial and error (or some trigonometry), we <em>can</em> find a value of
+<tt class="docutils literal"><span class="pre">search_range</span></tt> that works for this movie. But it requires more than a
+little patience:</p>
+<div class="code python highlight-python"><div class="highlight"><pre>%%time
+# Warning: takes several minutes!
+tracks_regular = trackpy.link_df(cg, 0.75)
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre>Frame 1: 441 trajectories present
+CPU times: user 4min 32s, sys: 769 ms, total: 4min 33s
+Wall time: 4min 35s
+</pre></div>
+</div>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">trshow</span><span class="p">(</span><span class="n">tracks_regular</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/adaptive-search_19_0.png" src="../_images/adaptive-search_19_0.png" />
+<p>As printed above, it took several minutes to track just 441 particles in
+2 frames. However, the result is correct, as shown by the plot, and by
+checking the duration of all the computed tracks:</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">tracks_regular</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">&#39;particle&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">particle</span><span class="o">.</span><span class="n">count</span><span class="p">()</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre>2    441
+dtype: int64
+</pre></div>
+</div>
+<p>This result indicates that there are 441 tracks that last for 2 frames,
+and no tracks that last for 1 frame, which would represent unlinked
+particles. So linking was successful, but at great cost.</p>
+</div>
+<div class="section" id="linking-with-adaptive-search">
+<h3>Linking with adaptive search<a class="headerlink" href="#linking-with-adaptive-search" title="Permalink to this headline">¶</a></h3>
+<p>Since we know this movie is tricky, we choose a very fine
+<tt class="docutils literal"><span class="pre">adaptive_step</span></tt> — just 1% per iteration. But we can choose an
+irresponsibly large <tt class="docutils literal"><span class="pre">search_range</span></tt> of 0.95 — almost the spacing
+between particles!</p>
+<div class="code python highlight-python"><div class="highlight"><pre>%%time
+tracks_adaptive = trackpy.link_df(cg, 0.95, adaptive_stop=0.56, adaptive_step=0.99)
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre>Frame 1: 441 trajectories present
+CPU times: user 169 ms, sys: 3.16 ms, total: 172 ms
+Wall time: 172 ms
+</pre></div>
+</div>
+<p>With adaptive search enabled, we can obtain the correct results more
+than an order of magnitude faster than we could with the single value of
+<tt class="docutils literal"><span class="pre">search_range</span></tt> we found by hand. Almost as importantly, this
+computation was not preceded by rounds of trial and error to select
+<tt class="docutils literal"><span class="pre">search_range</span></tt>.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">trshow</span><span class="p">(</span><span class="n">tracks_adaptive</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/adaptive-search_26_0.png" src="../_images/adaptive-search_26_0.png" />
+<p>Both the plot and our check of track lengths show that the result is
+correct.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">tracks_adaptive</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">&#39;particle&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">particle</span><span class="o">.</span><span class="n">count</span><span class="p">()</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre>2    441
+dtype: int64
+</pre></div>
+</div>
+</div>
+<div class="section" id="seeing-adaptive-search-at-work">
+<h3>Seeing adaptive search at work<a class="headerlink" href="#seeing-adaptive-search-at-work" title="Permalink to this headline">¶</a></h3>
+<p>We can use linking diagnostics, also new in <tt class="docutils literal"><span class="pre">trackpy</span></tt> v0.3, to see
+what adaptive search did. (See the separate tutorial on diagnostics for
+a more complete overview.) Let&#8217;s re-run linking with diagnostics, and
+look at the <tt class="docutils literal"><span class="pre">search_range</span></tt> that was used to link each particle in the
+second frame. (It&#8217;s not recorded for the first frame because those
+particles have no preceding frame.)</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">tracks_adaptive</span> <span class="o">=</span> <span class="n">trackpy</span><span class="o">.</span><span class="n">link_df</span><span class="p">(</span><span class="n">cg</span><span class="p">,</span> <span class="mf">0.95</span><span class="p">,</span> <span class="n">adaptive_stop</span><span class="o">=</span><span class="mf">0.56</span><span class="p">,</span> <span class="n">adaptive_step</span><span class="o">=</span><span class="mf">0.99</span><span class="p">,</span> <span class="n">diagnostics</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre>Frame 1: 441 trajectories present
+</pre></div>
+</div>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">scatter</span><span class="p">(</span><span class="n">tracks_adaptive</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">tracks_adaptive</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">tracks_adaptive</span><span class="o">.</span><span class="n">diag_search_range</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">),</span>
+        <span class="n">s</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">GnBu</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
+<span class="n">colorbar</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s">&#39;diag_search_range&#39;</span><span class="p">)</span>
+<span class="n">axis</span><span class="p">(</span><span class="s">&#39;image&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+<img alt="../_images/adaptive-search_31_0.png" src="../_images/adaptive-search_31_0.png" />
+<p>As we might have guessed, adaptive search worked by reducing
+<tt class="docutils literal"><span class="pre">search_range</span></tt> in the trouble spots at the corners.</p>
+</div>
+<div class="section" id="a-final-note">
+<h3>A final note<a class="headerlink" href="#a-final-note" title="Permalink to this headline">¶</a></h3>
+<p>As discussed above, adaptive search is not magic, and it may create the
+false impression that bad data are trackable. Until you are confident
+that you&#8217;re using adaptive search properly, it&#8217;s a good idea to pay
+attention to diagnostic output, especially <tt class="docutils literal"><span class="pre">diag_search_range</span></tt>, to get
+a sense of where and how often it&#8217;s used.</p>
+</div>
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+<div id="sourcelink">
+  <a href="../_sources/tutorial/adaptive-search.txt"
+     rel="nofollow">Source</a>
+</div>
+      
+    </p>
+    <p>
+        &copy; Copyright 2010-2014, Trackpy Contributors.<br/>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2.3.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

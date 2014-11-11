@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Obtaining Diagnostic Information from Linking &mdash; trackpy 0.2.3-169-gd1aa128 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/bootswatch-3.2.0/spacelab/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.2.3-169-gd1aa128',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-3.2.0/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="trackpy 0.2.3-169-gd1aa128 documentation" href="../index.html" />
+    <link rel="next" title="Parallelized Feature Location using IPython Parallel" href="parallel-locate.html" />
+    <link rel="prev" title="Making trackpy fast(er)" href="performance.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html">
+          trackpy</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.2.3-169-gd1aa128</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../tutorial.html">Tutorial</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Introduction to Trackpy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installing Trackpy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html#updating-your-installation">Updating Your Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../whatsnew.html">What&#8217;s new in the package</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="walkthrough.html">Walkthrough</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prediction.html">Prediction: Beyond Simple Random Walks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tracking-3d.html">Feature finding in 3D confocal images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="uncertainty.html">Subpixel Accuracy and Uncertainty Estimation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="subnets.html">Advanced Linking: Subnetworks and <tt class="docutils literal"><span class="pre">search_range</span></tt></a></li>
+<li class="toctree-l1"><a class="reference internal" href="adaptive-search.html">Adaptive Search: Changing <tt class="docutils literal"><span class="pre">search_range</span></tt> on the Fly</a></li>
+<li class="toctree-l1"><a class="reference internal" href="on-disk.html">Streaming: Processing Unlimited Frames On-Disk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="performance.html">Making trackpy fast(er)</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">Obtaining Diagnostic Information from Linking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parallel-locate.html">Parallelized Feature Location using IPython Parallel</a></li>
+<li class="toctree-l1"><a class="reference internal" href="custom-feature-detection.html">Custom Feature Detection: Bubble tracking in 2D foams</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">Obtaining Diagnostic Information from Linking</a><ul>
+<li><a class="reference internal" href="#how-to-use-it">How to use it</a><ul>
+<li><a class="reference internal" href="#details">Details</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#example">Example</a><ul>
+<li><a class="reference internal" href="#diag-search-range"><tt class="docutils literal"><span class="pre">diag_search_range</span></tt></a></li>
+<li><a class="reference internal" href="#diag-remembered"><tt class="docutils literal"><span class="pre">diag_remembered</span></tt></a></li>
+<li><a class="reference internal" href="#diag-subnet"><tt class="docutils literal"><span class="pre">diag_subnet</span></tt></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      
+  <div class="section" id="obtaining-diagnostic-information-from-linking">
+<h1>Obtaining Diagnostic Information from Linking<a class="headerlink" href="#obtaining-diagnostic-information-from-linking" title="Permalink to this headline">¶</a></h1>
+<p>Beginning with version 0.3, <tt class="docutils literal"><span class="pre">link_df()</span></tt> and <tt class="docutils literal"><span class="pre">link_df_iter()</span></tt> can
+include diagnostic data in their output, to give you clues about what
+the linking algorithm did while linking each particle. This information
+may help to diagnose errors or bad results from linking, or to verify
+that the linking algorithm is working properly.</p>
+<div class="section" id="how-to-use-it">
+<h2>How to use it<a class="headerlink" href="#how-to-use-it" title="Permalink to this headline">¶</a></h2>
+<p>Pass the optional keyword argument <tt class="docutils literal"><span class="pre">diagnostics=True</span></tt> to <tt class="docutils literal"><span class="pre">link_df()</span></tt>
+or <tt class="docutils literal"><span class="pre">link_df_iter()</span></tt>. The linker will add the &#8220;particle&#8221; column as
+usual, along with extra columns whose names begin with &#8220;<tt class="docutils literal"><span class="pre">diag_</span></tt>&#8221;.
+Not all types of diagnostic data may pertain to every particle, so that
+many entries in these diagnostic columns will have the placeholder value
+of <tt class="docutils literal"><span class="pre">NaN</span></tt> (not a number).</p>
+<p>We&#8217;ll discuss the individual columns and their meanings below, by way of
+an example: the <tt class="docutils literal"><span class="pre">bulk_water</span></tt> movie that was tracked in the walkthrough
+tutorial.</p>
+<div class="section" id="details">
+<h3>Details<a class="headerlink" href="#details" title="Permalink to this headline">¶</a></h3>
+<ol class="arabic simple">
+<li>Diagnostics typically slow down linking by a few percent and consume
+significant additional memory, so they are turned off by default.</li>
+<li>If you already ran linking with diagnostics turned on, but no longer
+want the extra columns cluttering up your results, you can use the
+<tt class="docutils literal"><span class="pre">strip_diagnostics()</span></tt> function to automatically remove all columns
+whose names start with &#8220;<tt class="docutils literal"><span class="pre">diag_</span></tt>&#8221;.</li>
+<li>The set of diagnostic of columns, and the order in which they appear,
+is not fixed. Each column is added only if that diagnostic datum was
+recorded. For example, below we will encounter the
+<tt class="docutils literal"><span class="pre">diag_remembered</span></tt> column that gives information about the
+<tt class="docutils literal"><span class="pre">memory</span></tt> feature. If you did not specify the <tt class="docutils literal"><span class="pre">memory</span></tt> option for
+linking, this column will never be present in your results.</li>
+<li>For performance reasons, <tt class="docutils literal"><span class="pre">link_df()</span></tt> ordinarily does <em>not</em> make a
+copy of its input DataFrame, instead modifying it in-place. For
+practical reasons, however, with diagnostics enabled <tt class="docutils literal"><span class="pre">link_df()</span></tt>
+must work on a copy. Depending on how it was written, your program
+may therefore behave differently when diagnostics are turned on! If
+you suspect a problem, you can instruct <tt class="docutils literal"><span class="pre">link_df()</span></tt> to behave more
+consistently by supplying <tt class="docutils literal"><span class="pre">copy_features=True</span></tt>.</li>
+</ol>
+</div>
+</div>
+<div class="section" id="example">
+<h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
+<p>We&#8217;ll track the <tt class="docutils literal"><span class="pre">bulk_water</span></tt> movie much as in the walkthrough, but
+with <tt class="docutils literal"><span class="pre">diagnostics=True</span></tt>. We&#8217;ll then examine the data we get back.
+First, we set up our environment:</p>
+<div class="code python highlight-python"><div class="highlight"><pre># For the IPython notebook
+%matplotlib inline
+
+
+from __future__ import print_function  # For compatibility with both Python 2 and 3
+import numpy as np
+import pandas as pd
+from pandas import DataFrame, Series
+
+import pims
+import trackpy as tp
+</pre></div>
+</div>
+<p>4 frames should be enough for this demonstration.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">frames</span> <span class="o">=</span> <span class="n">pims</span><span class="o">.</span><span class="n">ImageSequence</span><span class="p">(</span><span class="s">&#39;../sample_data/bulk_water/*.png&#39;</span><span class="p">,</span> <span class="n">as_grey</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="n">f</span> <span class="o">=</span> <span class="n">tp</span><span class="o">.</span><span class="n">batch</span><span class="p">(</span><span class="n">frames</span><span class="p">[:</span><span class="mi">4</span><span class="p">],</span> <span class="mi">11</span><span class="p">,</span> <span class="n">minmass</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span> <span class="n">invert</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre>Frame 3: 454 features
+</pre></div>
+</div>
+<p>We&#8217;ll link with a larger <tt class="docutils literal"><span class="pre">search_radius</span></tt> than in the tutorial, because
+we want to generate a lot of subnetworks (more on that below).</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">t</span> <span class="o">=</span> <span class="n">tp</span><span class="o">.</span><span class="n">link_df</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="mi">13</span><span class="p">,</span> <span class="n">memory</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">diagnostics</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre>Frame 3: 454 trajectories present
+</pre></div>
+</div>
+<p>When we look at the columns in the resulting tracks DataFrame, we see
+some new names:</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="nb">list</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">[</span><span class="s">u&#39;x&#39;</span><span class="p">,</span>
+ <span class="s">u&#39;y&#39;</span><span class="p">,</span>
+ <span class="s">u&#39;mass&#39;</span><span class="p">,</span>
+ <span class="s">u&#39;size&#39;</span><span class="p">,</span>
+ <span class="s">u&#39;ecc&#39;</span><span class="p">,</span>
+ <span class="s">u&#39;signal&#39;</span><span class="p">,</span>
+ <span class="s">u&#39;ep&#39;</span><span class="p">,</span>
+ <span class="s">u&#39;frame&#39;</span><span class="p">,</span>
+ <span class="s">u&#39;particle&#39;</span><span class="p">,</span>
+ <span class="s">u&#39;diag_search_range&#39;</span><span class="p">,</span>
+ <span class="s">u&#39;diag_subnet&#39;</span><span class="p">,</span>
+ <span class="s">u&#39;diag_subnet_iterations&#39;</span><span class="p">,</span>
+ <span class="s">u&#39;diag_subnet_size&#39;</span><span class="p">,</span>
+ <span class="s">u&#39;diag_remembered&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Let&#8217;s look at the first 5 rows in the results. Because there are so many
+columns, we&#8217;ll transpose the data so they fit on the page.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">t</span><span class="o">.</span><span class="n">head</span><span class="p">()</span><span class="o">.</span><span class="n">T</span>
+</pre></div>
+</div>
+<div style="max-height:1000px;max-width:1500px;overflow:auto;">
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>0</th>
+      <th>1</th>
+      <th>2</th>
+      <th>3</th>
+      <th>4</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>x</th>
+      <td>   295.1748</td>
+      <td>   295.3752</td>
+      <td>  296.3342</td>
+      <td>   296.0958</td>
+      <td>   309.7269</td>
+    </tr>
+    <tr>
+      <th>y</th>
+      <td>   5.537289</td>
+      <td>   5.242568</td>
+      <td>  5.641714</td>
+      <td>    5.86064</td>
+      <td>    6.88456</td>
+    </tr>
+    <tr>
+      <th>mass</th>
+      <td>       3741</td>
+      <td>       3801</td>
+      <td>      4061</td>
+      <td>       4248</td>
+      <td>       2798</td>
+    </tr>
+    <tr>
+      <th>size</th>
+      <td>   2.624754</td>
+      <td>    2.56081</td>
+      <td>  2.720502</td>
+      <td>   2.772655</td>
+      <td>   3.342227</td>
+    </tr>
+    <tr>
+      <th>ecc</th>
+      <td>  0.1650543</td>
+      <td>    0.19938</td>
+      <td> 0.2037625</td>
+      <td>  0.2161286</td>
+      <td>  0.0592067</td>
+    </tr>
+    <tr>
+      <th>signal</th>
+      <td>   35.44475</td>
+      <td>   55.57995</td>
+      <td>  43.54474</td>
+      <td>   38.58652</td>
+      <td>  -112.5553</td>
+    </tr>
+    <tr>
+      <th>ep</th>
+      <td> 0.07923014</td>
+      <td> 0.05308473</td>
+      <td> 0.0617964</td>
+      <td> 0.06639387</td>
+      <td>-0.01616131</td>
+    </tr>
+    <tr>
+      <th>frame</th>
+      <td>          0</td>
+      <td>          1</td>
+      <td>         2</td>
+      <td>          3</td>
+      <td>          0</td>
+    </tr>
+    <tr>
+      <th>particle</th>
+      <td>          0</td>
+      <td>          0</td>
+      <td>         0</td>
+      <td>          0</td>
+      <td>          1</td>
+    </tr>
+    <tr>
+      <th>diag_search_range</th>
+      <td>        NaN</td>
+      <td>         13</td>
+      <td>        13</td>
+      <td>         13</td>
+      <td>        NaN</td>
+    </tr>
+    <tr>
+      <th>diag_subnet</th>
+      <td>        NaN</td>
+      <td>        NaN</td>
+      <td>       NaN</td>
+      <td>        NaN</td>
+      <td>        NaN</td>
+    </tr>
+    <tr>
+      <th>diag_subnet_iterations</th>
+      <td>        NaN</td>
+      <td>        NaN</td>
+      <td>       NaN</td>
+      <td>        NaN</td>
+      <td>        NaN</td>
+    </tr>
+    <tr>
+      <th>diag_subnet_size</th>
+      <td>        NaN</td>
+      <td>        NaN</td>
+      <td>       NaN</td>
+      <td>        NaN</td>
+      <td>        NaN</td>
+    </tr>
+    <tr>
+      <th>diag_remembered</th>
+      <td>        NaN</td>
+      <td>        NaN</td>
+      <td>       NaN</td>
+      <td>        NaN</td>
+      <td>        NaN</td>
+    </tr>
+  </tbody>
+</table>
+</div><div class="section" id="diag-search-range">
+<h3><tt class="docutils literal"><span class="pre">diag_search_range</span></tt><a class="headerlink" href="#diag-search-range" title="Permalink to this headline">¶</a></h3>
+<p><tt class="docutils literal"><span class="pre">trackpy</span></tt> didn&#8217;t record every kind of diagnostic data for every
+feature. We do notice, however, that there is a <tt class="docutils literal"><span class="pre">diag_search_range</span></tt>
+for everything past the first frame. This column is the value of
+<tt class="docutils literal"><span class="pre">search_range</span></tt> that was used to find a particle and link it. Since the
+particles in the first frame did not need to be found,
+<tt class="docutils literal"><span class="pre">diag_search_range</span></tt> is null there. But for the second and third frames
+(numbers 1 and 2), it is the same as the <tt class="docutils literal"><span class="pre">search_range</span></tt> we told
+<tt class="docutils literal"><span class="pre">link_df()</span></tt> to use, because those particles were successfully linked.</p>
+<p><tt class="docutils literal"><span class="pre">diag_search_range</span></tt> would be a nearly pointless column except that it
+reveals the workings of adaptive search when that feature is turned on.
+See the tutorial on adaptive search for a more meaningful look at
+<tt class="docutils literal"><span class="pre">diag_search_range</span></tt>.</p>
+</div>
+<div class="section" id="diag-remembered">
+<h3><tt class="docutils literal"><span class="pre">diag_remembered</span></tt><a class="headerlink" href="#diag-remembered" title="Permalink to this headline">¶</a></h3>
+<p>When a particle seems to disappear, <tt class="docutils literal"><span class="pre">memory</span></tt> allows its &#8220;ghost&#8221; to
+stick around for a few more frames in case that particle reappears. In
+that event, the <tt class="docutils literal"><span class="pre">diag_remembered</span></tt> column records the number of frames
+for which the particle was missing. Let&#8217;s look in the 4th frame to see
+whether this actually happened. Again, we show just the first 5 entires
+and transpose to fit on the page:</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">remembered_frame3</span> <span class="o">=</span> <span class="n">t</span><span class="p">[(</span><span class="n">t</span><span class="o">.</span><span class="n">frame</span> <span class="o">==</span> <span class="mi">3</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">diag_remembered</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)]</span>
+
+<span class="k">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">remembered_frame3</span><span class="p">),</span> <span class="s">&#39;remembered particles in frame number 3.&#39;</span><span class="p">)</span>
+<span class="n">remembered_frame3</span><span class="o">.</span><span class="n">head</span><span class="p">()</span><span class="o">.</span><span class="n">T</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre>6 remembered particles in frame number 3.
+</pre></div>
+</div>
+<div style="max-height:1000px;max-width:1500px;overflow:auto;">
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>15</th>
+      <th>54</th>
+      <th>684</th>
+      <th>1062</th>
+      <th>1753</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>x</th>
+      <td>   275.6707</td>
+      <td>   122.9928</td>
+      <td>   263.8891</td>
+      <td>   296.0939</td>
+      <td>    329.874</td>
+    </tr>
+    <tr>
+      <th>y</th>
+      <td>   7.843685</td>
+      <td>   14.99186</td>
+      <td>   167.9982</td>
+      <td>   249.6216</td>
+      <td>   51.09198</td>
+    </tr>
+    <tr>
+      <th>mass</th>
+      <td>       2399</td>
+      <td>       2212</td>
+      <td>       2173</td>
+      <td>       2738</td>
+      <td>       2707</td>
+    </tr>
+    <tr>
+      <th>size</th>
+      <td>   2.875998</td>
+      <td>   3.393431</td>
+      <td>   3.399264</td>
+      <td>   3.222399</td>
+      <td>   3.466767</td>
+    </tr>
+    <tr>
+      <th>ecc</th>
+      <td>  0.2319915</td>
+      <td>  0.1556412</td>
+      <td> 0.04222345</td>
+      <td> 0.07553068</td>
+      <td> 0.05677761</td>
+    </tr>
+    <tr>
+      <th>signal</th>
+      <td>  -125.4135</td>
+      <td>  -111.4135</td>
+      <td>  -106.4135</td>
+      <td>  -125.4135</td>
+      <td>  -100.4135</td>
+    </tr>
+    <tr>
+      <th>ep</th>
+      <td>-0.01908911</td>
+      <td>-0.01611284</td>
+      <td>-0.01682275</td>
+      <td>-0.01560399</td>
+      <td>-0.01727066</td>
+    </tr>
+    <tr>
+      <th>frame</th>
+      <td>          3</td>
+      <td>          3</td>
+      <td>          3</td>
+      <td>          3</td>
+      <td>          3</td>
+    </tr>
+    <tr>
+      <th>particle</th>
+      <td>          4</td>
+      <td>         15</td>
+      <td>        179</td>
+      <td>        278</td>
+      <td>        459</td>
+    </tr>
+    <tr>
+      <th>diag_search_range</th>
+      <td>         13</td>
+      <td>         13</td>
+      <td>         13</td>
+      <td>         13</td>
+      <td>         13</td>
+    </tr>
+    <tr>
+      <th>diag_subnet</th>
+      <td>        NaN</td>
+      <td>        NaN</td>
+      <td>        NaN</td>
+      <td>         99</td>
+      <td>        103</td>
+    </tr>
+    <tr>
+      <th>diag_subnet_iterations</th>
+      <td>        NaN</td>
+      <td>        NaN</td>
+      <td>        NaN</td>
+      <td>          3</td>
+      <td>          7</td>
+    </tr>
+    <tr>
+      <th>diag_subnet_size</th>
+      <td>        NaN</td>
+      <td>        NaN</td>
+      <td>        NaN</td>
+      <td>          2</td>
+      <td>          4</td>
+    </tr>
+    <tr>
+      <th>diag_remembered</th>
+      <td>          1</td>
+      <td>          1</td>
+      <td>          1</td>
+      <td>          2</td>
+      <td>          1</td>
+    </tr>
+  </tbody>
+</table>
+</div><p>One of these particles has a <tt class="docutils literal"><span class="pre">diag_remembered</span></tt> value of 2, which means
+that it was present in the first frame, went missing for 2 frames, and
+then seemingly reappeared in the fourth frame.</p>
+<p>If you are not sure whether memory (or a specific value of the
+<tt class="docutils literal"><span class="pre">memory</span></tt> option) is appropriate for your movie, <tt class="docutils literal"><span class="pre">diag_remembered</span></tt>
+shows you which trajectories and frames to spot-check.</p>
+</div>
+<div class="section" id="diag-subnet">
+<h3><tt class="docutils literal"><span class="pre">diag_subnet</span></tt><a class="headerlink" href="#diag-subnet" title="Permalink to this headline">¶</a></h3>
+<p>As you may have also learned in other <tt class="docutils literal"><span class="pre">trackpy</span></tt> tutorials (including
+the one devoted to the topic), how easily subnetworks arise, and how
+they are resolved, can be crucial to the feasibility and correctness of
+linking. <tt class="docutils literal"><span class="pre">trackpy</span></tt> records diagnostic data whenever it encounters a
+subnetwork. (If there were no subnetworks at all, the columns discussed
+here will not be present.) As with memory, these data can help you focus
+on potential trouble spots.</p>
+<p>In our example data, we can see what subnetworks were encountered when
+linking frames 0 and 1:</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">subnet_particles</span> <span class="o">=</span> <span class="n">t</span><span class="p">[(</span><span class="n">t</span><span class="o">.</span><span class="n">frame</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="o">~</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">diag_subnet</span><span class="o">.</span><span class="n">isnull</span><span class="p">())]</span>
+
+<span class="k">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">subnet_particles</span><span class="p">),</span> <span class="s">&#39;particles involved in subnets between frames 0 and 1.&#39;</span><span class="p">)</span>
+<span class="n">subnet_particles</span><span class="o">.</span><span class="n">head</span><span class="p">()</span><span class="o">.</span><span class="n">T</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre>66 particles involved in subnets between frames 0 and 1.
+</pre></div>
+</div>
+<div style="max-height:1000px;max-width:1500px;overflow:auto;">
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>32</th>
+      <th>40</th>
+      <th>210</th>
+      <th>218</th>
+      <th>263</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>x</th>
+      <td>   540.9631</td>
+      <td>   552.7497</td>
+      <td>    20.6954</td>
+      <td>   339.6487</td>
+      <td>   346.1563</td>
+    </tr>
+    <tr>
+      <th>y</th>
+      <td>   8.498964</td>
+      <td>   11.44873</td>
+      <td>   54.82698</td>
+      <td>   56.97173</td>
+      <td>   67.19563</td>
+    </tr>
+    <tr>
+      <th>mass</th>
+      <td>       2896</td>
+      <td>       3160</td>
+      <td>       4803</td>
+      <td>       3077</td>
+      <td>       2469</td>
+    </tr>
+    <tr>
+      <th>size</th>
+      <td>   2.882721</td>
+      <td>   2.319087</td>
+      <td>   3.103194</td>
+      <td>   3.017014</td>
+      <td>   2.577043</td>
+    </tr>
+    <tr>
+      <th>ecc</th>
+      <td> 0.04712119</td>
+      <td> 0.05773689</td>
+      <td>  0.1552015</td>
+      <td>  0.1415368</td>
+      <td>  0.1224707</td>
+    </tr>
+    <tr>
+      <th>signal</th>
+      <td>  -125.4201</td>
+      <td>   44.57995</td>
+      <td>  -100.4201</td>
+      <td>  -125.4201</td>
+      <td>  -125.4201</td>
+    </tr>
+    <tr>
+      <th>ep</th>
+      <td>-0.01882312</td>
+      <td> 0.08029512</td>
+      <td>-0.02059843</td>
+      <td>-0.01733468</td>
+      <td>-0.02324033</td>
+    </tr>
+    <tr>
+      <th>frame</th>
+      <td>          1</td>
+      <td>          1</td>
+      <td>          1</td>
+      <td>          1</td>
+      <td>          1</td>
+    </tr>
+    <tr>
+      <th>particle</th>
+      <td>          9</td>
+      <td>         11</td>
+      <td>         56</td>
+      <td>         58</td>
+      <td>         70</td>
+    </tr>
+    <tr>
+      <th>diag_search_range</th>
+      <td>         13</td>
+      <td>         13</td>
+      <td>         13</td>
+      <td>         13</td>
+      <td>         13</td>
+    </tr>
+    <tr>
+      <th>diag_subnet</th>
+      <td>         13</td>
+      <td>         13</td>
+      <td>         15</td>
+      <td>         14</td>
+      <td>         14</td>
+    </tr>
+    <tr>
+      <th>diag_subnet_iterations</th>
+      <td>          3</td>
+      <td>          3</td>
+      <td>          1</td>
+      <td>          3</td>
+      <td>          3</td>
+    </tr>
+    <tr>
+      <th>diag_subnet_size</th>
+      <td>          2</td>
+      <td>          2</td>
+      <td>          1</td>
+      <td>          2</td>
+      <td>          2</td>
+    </tr>
+    <tr>
+      <th>diag_remembered</th>
+      <td>        NaN</td>
+      <td>        NaN</td>
+      <td>        NaN</td>
+      <td>        NaN</td>
+      <td>        NaN</td>
+    </tr>
+  </tbody>
+</table>
+</div><p>The subnet columns are as follows:</p>
+<p><strong>``diag_subnet``</strong> sequentially numbers each subnet as it is
+encountered. This allows you to count subnets, and identify particles
+that are in the same subnet. Note that the numbering is sequential over
+the <em>entire movie</em>. Therefore, to count the subnets in a particular
+frame, use</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="nb">len</span><span class="p">(</span><span class="n">subnet_particles</span><span class="o">.</span><span class="n">diag_subnet</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="mi">33</span>
+</pre></div>
+</div>
+<p>We can also take this opportunity to show these subnet particles. This
+would be the starting point for more in-depth spot checks of how subnets
+were solved.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">tp</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="n">subnet_particles</span><span class="p">,</span> <span class="n">frames</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">plot_style</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;markersize&#39;</span><span class="p">:</span> <span class="mi">10</span><span class="p">});</span>
+</pre></div>
+</div>
+<img alt="../_images/linking-diagnostics_20_0.png" src="../_images/linking-diagnostics_20_0.png" />
+<p>Like <tt class="docutils literal"><span class="pre">diag_subnet</span></tt>, the columns <tt class="docutils literal"><span class="pre">diag_subnet_size</span></tt> and
+<tt class="docutils literal"><span class="pre">diag_subnet_iterations</span></tt> also pertain to the entire subnet; all
+members of a subnet have the same values. It would be nice to
+consolidate these data into a shorter table of the subnets and their
+properties. To do this, we can use the powerful grouping and aggregation
+features of Pandas:</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">subnets</span> <span class="o">=</span> <span class="n">subnet_particles</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">&#39;diag_subnet&#39;</span><span class="p">)[[</span><span class="s">&#39;diag_subnet_size&#39;</span><span class="p">,</span> <span class="s">&#39;diag_subnet_iterations&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+
+<span class="c"># Count how many particles in the *present* frame are in each subnet,</span>
+<span class="c"># and include it in the results.</span>
+<span class="n">subnet_current_sizes</span> <span class="o">=</span> <span class="n">subnet_particles</span><span class="o">.</span><span class="n">diag_subnet</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
+<span class="n">subnet_current_sizes</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s">&#39;current_size&#39;</span>
+<span class="n">subnets</span> <span class="o">=</span> <span class="n">subnets</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subnet_current_sizes</span><span class="p">)</span>
+
+<span class="n">subnets</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+<div style="max-height:1000px;max-width:1500px;overflow:auto;">
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>diag_subnet_size</th>
+      <th>diag_subnet_iterations</th>
+      <th>current_size</th>
+    </tr>
+    <tr>
+      <th>diag_subnet</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td> 2</td>
+      <td>  3</td>
+      <td> 2</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td> 1</td>
+      <td>  1</td>
+      <td> 2</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td> 2</td>
+      <td>  3</td>
+      <td> 2</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td> 2</td>
+      <td>  3</td>
+      <td> 2</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td> 3</td>
+      <td> 21</td>
+      <td> 2</td>
+    </tr>
+  </tbody>
+</table>
+</div><p>Each subnet involves a set of trajectories in the past (generally the
+previous frame), and a set of candidate particles in the present (the
+frame in which the diagnostic info was recorded).
+<strong>``diag_subnet_size``</strong> gives the number of particles in the past, and
+in this example, we computed the <tt class="docutils literal"><span class="pre">current_size</span></tt> column to see the
+number in the present. You can see that some subnets necessitated the
+ending of a trajectory (e.g. 3 particles to 2), while others required
+creation (e.g. 1 to 2).</p>
+<p>Finally, the <strong>``diag_subnet_iterations``</strong> column counts the number of
+possible solutions that were explored by the subnet-solving algorithm
+before it decided which was best. It is therefore roughly proportional
+to the time spent solving each subnet. These data are recorded by the
+numba linker only (<tt class="docutils literal"><span class="pre">link_strategy='numba'</span></tt>), which is used by default
+if <tt class="docutils literal"><span class="pre">numba</span></tt> is installed. Almost all of the subnets we&#8217;re examining are
+small and were solved quickly:</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">subnets</span><span class="o">.</span><span class="n">diag_subnet_iterations</span><span class="o">.</span><span class="n">hist</span><span class="p">()</span>
+<span class="n">xlabel</span><span class="p">(</span><span class="s">&#39;Time to solve subnet (arbitrary units)&#39;</span><span class="p">)</span>
+<span class="n">ylabel</span><span class="p">(</span><span class="s">&#39;Number of occurrences&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+<img alt="../_images/linking-diagnostics_24_0.png" src="../_images/linking-diagnostics_24_0.png" />
+<p>However, a subnet of <span class="math">\(\sim\)</span> 25 particles can easily take
+<span class="math">\(10^9\)</span> iterations or more to solve.</p>
+</div>
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+<div id="sourcelink">
+  <a href="../_sources/tutorial/linking-diagnostics.txt"
+     rel="nofollow">Source</a>
+</div>
+      
+    </p>
+    <p>
+        &copy; Copyright 2010-2014, Trackpy Contributors.<br/>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2.3.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

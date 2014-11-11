@@ -1,0 +1,6 @@
+trackpy.utils.print_update
+==========================
+
+.. currentmodule:: trackpy.utils
+
+.. autofunction:: print_update

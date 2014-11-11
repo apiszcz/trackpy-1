@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Walkthrough &mdash; trackpy 0.2.3-169-gd1aa128 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/bootswatch-3.2.0/spacelab/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.2.3-169-gd1aa128',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-3.2.0/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="trackpy 0.2.3-169-gd1aa128 documentation" href="../index.html" />
+    <link rel="next" title="Prediction: Beyond Simple Random Walks" href="prediction.html" />
+    <link rel="prev" title="What’s new in the package" href="../whatsnew.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html">
+          trackpy</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.2.3-169-gd1aa128</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../tutorial.html">Tutorial</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Introduction to Trackpy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installing Trackpy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html#updating-your-installation">Updating Your Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../whatsnew.html">What&#8217;s new in the package</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="">Walkthrough</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prediction.html">Prediction: Beyond Simple Random Walks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tracking-3d.html">Feature finding in 3D confocal images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="uncertainty.html">Subpixel Accuracy and Uncertainty Estimation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="subnets.html">Advanced Linking: Subnetworks and <tt class="docutils literal"><span class="pre">search_range</span></tt></a></li>
+<li class="toctree-l1"><a class="reference internal" href="adaptive-search.html">Adaptive Search: Changing <tt class="docutils literal"><span class="pre">search_range</span></tt> on the Fly</a></li>
+<li class="toctree-l1"><a class="reference internal" href="on-disk.html">Streaming: Processing Unlimited Frames On-Disk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="performance.html">Making trackpy fast(er)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="linking-diagnostics.html">Obtaining Diagnostic Information from Linking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parallel-locate.html">Parallelized Feature Location using IPython Parallel</a></li>
+<li class="toctree-l1"><a class="reference internal" href="custom-feature-detection.html">Custom Feature Detection: Bubble tracking in 2D foams</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">Walkthrough</a><ul>
+<li><a class="reference internal" href="#scientific-ipython-setup">Scientific IPython Setup</a></li>
+<li><a class="reference internal" href="#step-1-read-the-data">Step 1: Read the Data</a><ul>
+<li><a class="reference internal" href="#opening-images-or-video">Opening images or video</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#step-2-locate-features">Step 2: Locate Features</a><ul>
+<li><a class="reference internal" href="#refine-parameters-to-elminate-spurious-features">Refine parameters to elminate spurious features</a></li>
+<li><a class="reference internal" href="#check-for-subpixel-accuracy">Check for subpixel accuracy</a></li>
+<li><a class="reference internal" href="#locate-features-in-all-frames">Locate features in all frames</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#step-3-link-features-into-particle-trajectories">Step 3: Link features into particle trajectories</a><ul>
+<li><a class="reference internal" href="#filter-spurious-trajectories">Filter spurious trajectories.</a></li>
+<li><a class="reference internal" href="#remove-overall-drift">Remove overall drift</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#step-4-analyze-trajectories">Step 4: Analyze trajectories</a><ul>
+<li><a class="reference internal" href="#mean-squared-displacement-of-individal-probes">Mean Squared Displacement of Individal Probes</a></li>
+<li><a class="reference internal" href="#ensemble-mean-squared-displacement">Ensemble Mean Squared Displacement</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#preview-of-advanced-features">Preview of Advanced Features</a></li>
+<li><a class="reference internal" href="#streaming">Streaming</a></li>
+<li><a class="reference internal" href="#optional-high-performance-components-numba-and-fftw">Optional High Performance Components: Numba and FFTW</a><ul>
+<li><a class="reference internal" href="#numba">Numba</a></li>
+<li><a class="reference internal" href="#fftw-fastest-fourier-transform-in-the-west">FFTW (&#8220;Fastest Fourier Transform in the West&#8221;)</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#parellelization">Parellelization</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      
+  <div class="section" id="walkthrough">
+<h1>Walkthrough<a class="headerlink" href="#walkthrough" title="Permalink to this headline">¶</a></h1>
+<p>This notebook follows an example project from start to finish. We take
+video of micron-sized particles diffusing in water, track them, and
+analyze the trajectories to obtain the viscosity of water.</p>
+<p>At the bottom of the notebook, we very briefly survey the more advanced
+features of trackpy. Browse the <a class="reference external" href="http://nbviewer.ipython.org/github/soft-matter/trackpy-examples/tree/master/notebooks/">full list of example
+notebooks</a>
+to learn more.</p>
+<div class="section" id="scientific-ipython-setup">
+<h2>Scientific IPython Setup<a class="headerlink" href="#scientific-ipython-setup" title="Permalink to this headline">¶</a></h2>
+<p>We need Python&#8217;s plotting library, matplotlib. Your environment might
+load matplotlib automatically, but for this tutorial I&#8217;ll load it
+explicitly using this convention. If you are unfamiliar with matplotlib,
+do the same as I do here, and everything that follows will work without
+modification.</p>
+<div class="code python highlight-python"><div class="highlight"><pre>%matplotlib inline
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+
+# Optionally, tweak styles.
+mpl.rc(&#39;figure&#39;,  figsize=(10, 6))
+mpl.rc(&#39;image&#39;, cmap=&#39;gray&#39;)
+</pre></div>
+</div>
+<p>We also might want to use scientific Python libraries. Finally, we&#8217;ll
+import <tt class="docutils literal"><span class="pre">trackpy</span></tt> itself and its sister project, <tt class="docutils literal"><span class="pre">pims</span></tt>.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Series</span>  <span class="c"># for convenience</span>
+
+<span class="kn">import</span> <span class="nn">pims</span>
+<span class="kn">import</span> <span class="nn">trackpy</span> <span class="kn">as</span> <span class="nn">tp</span>
+</pre></div>
+</div>
+<p>We use the alias <tt class="docutils literal"><span class="pre">tp</span></tt> for brevity.</p>
+</div>
+<div class="section" id="step-1-read-the-data">
+<h2>Step 1: Read the Data<a class="headerlink" href="#step-1-read-the-data" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="opening-images-or-video">
+<h3>Opening images or video<a class="headerlink" href="#opening-images-or-video" title="Permalink to this headline">¶</a></h3>
+<p>To get our data into Python, we use our sister project,
+<a class="reference external" href="https://github.com/soft-matter/pims">PIMS</a> (Python Image Sequence).
+PIMS makes is easy and convenient to load and process video data from
+many formats with one consistent interface.</p>
+<p>You can read in: * a directory of sequential images using
+<tt class="docutils literal"><span class="pre">ImageSequence</span></tt> * a multi-frame TIFF file using <tt class="docutils literal"><span class="pre">TiffStack</span></tt> * a
+video (AVI, MOV, etc.) using <tt class="docutils literal"><span class="pre">Video</span></tt> * specialty formats used in
+microscopy and scientific video capture: * <tt class="docutils literal"><span class="pre">Cine</span></tt> * <tt class="docutils literal"><span class="pre">LSM</span></tt></p>
+<p><tt class="docutils literal"><span class="pre">ImageSequence</span></tt> works out of the box, so we recommended trying that to
+start. The others require some extra dependencies. See the README page.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">frames</span> <span class="o">=</span> <span class="n">pims</span><span class="o">.</span><span class="n">ImageSequence</span><span class="p">(</span><span class="s">&#39;../sample_data/bulk_water/*.png&#39;</span><span class="p">,</span> <span class="n">as_grey</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">frames</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre>&lt;Frames&gt;
+Source: /Users/danielallan/Documents/Repos/trackpy-examples/sample_data/bulk_water/*.png
+Length: 300 frames
+Frame Shape: 424 x 640
+Pixel Datatype: uint8
+</pre></div>
+</div>
+<p>We can access any frame like <tt class="docutils literal"><span class="pre">frames[frame_number]</span></tt>. The image is
+represented as a numpy array of intensities.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="k">print</span> <span class="n">frames</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c"># the first frame</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre>[[124 124 124 ..., 119 120 121]
+ [124 124 124 ..., 119 121 121]
+ [124 124 123 ..., 120 122 123]
+ ...,
+ [125 126 125 ..., 107  97  96]
+ [125 125 124 ..., 115 108 105]
+ [125 125 124 ..., 123 118 116]]
+</pre></div>
+</div>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">frames</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+<img alt="../_images/walkthrough_13_0.png" src="../_images/walkthrough_13_0.png" />
+<p>Frames behave like numpy arrays with a few extra properties.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">frames</span><span class="p">[</span><span class="mi">123</span><span class="p">]</span><span class="o">.</span><span class="n">frame_no</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="mi">123</span>
+</pre></div>
+</div>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">frames</span><span class="p">[</span><span class="mi">123</span><span class="p">]</span><span class="o">.</span><span class="n">metadata</span>  <span class="c"># Scientific formats can pass experiment meta data here.</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="step-2-locate-features">
+<h2>Step 2: Locate Features<a class="headerlink" href="#step-2-locate-features" title="Permalink to this headline">¶</a></h2>
+<p>Start with just the first frame. Estimate the size of the features (in
+pixels). The size must be an odd integer, and it is better to err on the
+large side, as we&#8217;ll see below. I estimate 11 pixels.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">f</span> <span class="o">=</span> <span class="n">tp</span><span class="o">.</span><span class="n">locate</span><span class="p">(</span><span class="n">frames</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">11</span><span class="p">,</span> <span class="n">invert</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<pre class="literal-block">
+Note: FFTW is configuring itself. This will take several seconds, but subsequent calls will run <em>much</em> faster.
+</pre>
+<p>The algorithm looks for <em>bright</em> features; since my features are dark, I
+set <tt class="docutils literal"><span class="pre">invert=True</span></tt>.</p>
+<p><tt class="docutils literal"><span class="pre">locate</span></tt> returns a spreadsheet-like object called a DataFrame. It
+lists</p>
+<ul class="simple">
+<li>each feature&#8217;s position,</li>
+<li>various characterizations of its appearance, which we will use to
+filter out spurious features,</li>
+<li>the &#8220;signal&#8221; strength and an estimate of uncertainty, both derived
+from this paper</li>
+</ul>
+<p>You can read more about DataFrames in the <a class="reference external" href="pandas.pydata.org/pandas-docs/stable/">pandas
+documentation</a>. They can
+easily be exported to formats like CSV, Excel, SQL, HDF5, etc.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">f</span><span class="o">.</span><span class="n">head</span><span class="p">()</span> <span class="c"># shows the first few rows of data</span>
+</pre></div>
+</div>
+<div style="max-height:1000px;max-width:1500px;overflow:auto;">
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>x</th>
+      <th>y</th>
+      <th>mass</th>
+      <th>size</th>
+      <th>ecc</th>
+      <th>signal</th>
+      <th>ep</th>
+      <th>frame</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td> 281.509343</td>
+      <td>  3.413149</td>
+      <td> 1445</td>
+      <td> 3.879411</td>
+      <td> 0.641666</td>
+      <td>-125.555015</td>
+      <td>-0.011513</td>
+      <td> 0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td> 552.871802</td>
+      <td> 11.106789</td>
+      <td> 3830</td>
+      <td> 2.409403</td>
+      <td> 0.130888</td>
+      <td>  66.444985</td>
+      <td> 0.049872</td>
+      <td> 0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td> 300.626322</td>
+      <td>  5.696044</td>
+      <td> 2553</td>
+      <td> 3.608320</td>
+      <td> 0.290576</td>
+      <td>-125.555015</td>
+      <td>-0.012818</td>
+      <td> 0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td> 341.992829</td>
+      <td>  6.598912</td>
+      <td> 4044</td>
+      <td> 3.639240</td>
+      <td> 0.350485</td>
+      <td>-125.555015</td>
+      <td>-0.012651</td>
+      <td> 0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>  36.036426</td>
+      <td>  8.142955</td>
+      <td> 4365</td>
+      <td> 2.927963</td>
+      <td> 0.116840</td>
+      <td>-108.555015</td>
+      <td>-0.021092</td>
+      <td> 0</td>
+    </tr>
+  </tbody>
+</table>
+</div><div class="code python highlight-python"><div class="highlight"><pre><span class="n">tp</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">frames</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</pre></div>
+</div>
+<img alt="../_images/walkthrough_21_0.png" src="../_images/walkthrough_21_0.png" />
+<div class="highlight-python"><div class="highlight"><pre>&lt;matplotlib.axes._subplots.AxesSubplot at 0x11a6a7990&gt;
+</pre></div>
+</div>
+<div class="section" id="refine-parameters-to-elminate-spurious-features">
+<h3>Refine parameters to elminate spurious features<a class="headerlink" href="#refine-parameters-to-elminate-spurious-features" title="Permalink to this headline">¶</a></h3>
+<p>Many of these circles are clearly wrong; they are fleeting peaks in
+brightness that aren&#8217;t actually particles. There are many ways to
+distinguish real particles from spurrious ones. The most important way
+is to look at total brightness (&#8220;mass&#8221;).</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">ax</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;mass&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">hist</span><span class="p">()</span>
+
+<span class="c"># Optionally, label the axes.</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">xlabel</span><span class="o">=</span><span class="s">&#39;mass&#39;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s">&#39;count&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre>[&lt;matplotlib.text.Text at 0x119be1250&gt;, &lt;matplotlib.text.Text at 0x11a6a7210&gt;]
+</pre></div>
+</div>
+<img alt="../_images/walkthrough_23_1.png" src="../_images/walkthrough_23_1.png" />
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">f</span> <span class="o">=</span> <span class="n">tp</span><span class="o">.</span><span class="n">locate</span><span class="p">(</span><span class="n">frames</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">11</span><span class="p">,</span> <span class="n">invert</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">minmass</span><span class="o">=</span><span class="mi">2000</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">tp</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">frames</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</pre></div>
+</div>
+<img alt="../_images/walkthrough_25_0.png" src="../_images/walkthrough_25_0.png" />
+<div class="highlight-python"><div class="highlight"><pre>&lt;matplotlib.axes._subplots.AxesSubplot at 0x11caccb10&gt;
+</pre></div>
+</div>
+<p>There are more options for controling and optimizing feature-finding.
+You can review them in the
+<a class="reference external" href="https://trackpy.readthedocs.org/en/latest/reference/trackpy.feature.html">documentation</a>.
+Or, pull them up as you work by typing <tt class="docutils literal"><span class="pre">tp.locate?</span></tt> into IPython.</p>
+</div>
+<div class="section" id="check-for-subpixel-accuracy">
+<h3>Check for subpixel accuracy<a class="headerlink" href="#check-for-subpixel-accuracy" title="Permalink to this headline">¶</a></h3>
+<p>As Eric Weeks points out in his related tutorial, a quick way to check
+for subpixel accuracy is to check that the decimal part of the x and/or
+y positions are evenly distributed. Trackpy provides a convenience
+plotting function for this:</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">tp</span><span class="o">.</span><span class="n">subpx_bias</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/walkthrough_28_0.png" src="../_images/walkthrough_28_0.png" />
+<div class="highlight-python"><div class="highlight"><pre>&lt;matplotlib.axes._subplots.AxesSubplot at 0x11b217810&gt;
+</pre></div>
+</div>
+<p>If we use a mask size that is too small, the histogram often shows a dip
+in the middle.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">tp</span><span class="o">.</span><span class="n">subpx_bias</span><span class="p">(</span><span class="n">tp</span><span class="o">.</span><span class="n">locate</span><span class="p">(</span><span class="n">frames</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">7</span><span class="p">,</span> <span class="n">invert</span><span class="o">=</span><span class="bp">True</span><span class="p">))</span>
+</pre></div>
+</div>
+<img alt="../_images/walkthrough_30_0.png" src="../_images/walkthrough_30_0.png" />
+<div class="highlight-python"><div class="highlight"><pre>&lt;matplotlib.axes._subplots.AxesSubplot at 0x11aa27950&gt;
+</pre></div>
+</div>
+</div>
+<div class="section" id="locate-features-in-all-frames">
+<h3>Locate features in all frames<a class="headerlink" href="#locate-features-in-all-frames" title="Permalink to this headline">¶</a></h3>
+<p>Or, to start, just explore a subset of the frames.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="43%" />
+<col width="57%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">selection</th>
+<th class="head">syntax example</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>all the frames</td>
+<td><tt class="docutils literal"><span class="pre">frames[:]</span></tt> or simply <tt class="docutils literal"><span class="pre">frames</span></tt>.</td>
+</tr>
+<tr class="row-odd"><td>the first 10 frames</td>
+<td><tt class="docutils literal"><span class="pre">frames[:10]</span></tt></td>
+</tr>
+<tr class="row-even"><td>the last 10 frames</td>
+<td><tt class="docutils literal"><span class="pre">frames[-10:]</span></tt></td>
+</tr>
+<tr class="row-odd"><td>a range of frames</td>
+<td><tt class="docutils literal"><span class="pre">frames[100:200]</span></tt></td>
+</tr>
+<tr class="row-even"><td>every 10th frame</td>
+<td><tt class="docutils literal"><span class="pre">frame[::10]</span></tt></td>
+</tr>
+<tr class="row-odd"><td>a list of specific frames</td>
+<td><tt class="docutils literal"><span class="pre">frames[[100,</span> <span class="pre">107,</span> <span class="pre">113]]</span></tt></td>
+</tr>
+</tbody>
+</table>
+<p>We&#8217;ll locate features in the first 300 frames from this video. We use
+<tt class="docutils literal"><span class="pre">tp.batch</span></tt>, which calls <tt class="docutils literal"><span class="pre">tp.locate</span></tt> on each frame and collects the
+results.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">f</span> <span class="o">=</span> <span class="n">tp</span><span class="o">.</span><span class="n">batch</span><span class="p">(</span><span class="n">frames</span><span class="p">[:</span><span class="mi">300</span><span class="p">],</span> <span class="mi">11</span><span class="p">,</span> <span class="n">minmass</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span> <span class="n">invert</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre>Frame 299: 402 features
+</pre></div>
+</div>
+<p>As each frame is analyzed, <tt class="docutils literal"><span class="pre">tp.batch</span></tt> reports the frame number and how
+many features were found. If this number runs unexpectedly low or high,
+you may wish to interrupt it and try different parameters.</p>
+</div>
+</div>
+<div class="section" id="step-3-link-features-into-particle-trajectories">
+<h2>Step 3: Link features into particle trajectories<a class="headerlink" href="#step-3-link-features-into-particle-trajectories" title="Permalink to this headline">¶</a></h2>
+<p>We have the locations of the particles in each frame. Next we&#8217;ll track
+particles from frame to frame, giving each one a number for
+identification.</p>
+<p>First, we must must specify a maximum displacement, the farthest a
+particle can travel between frames. We should choose the smallest
+reasonable value because a large value slows computation time
+considerably. In this case, 5 pixels is reasonable.</p>
+<p>Second, we allow for the possibility that a particle might be missed for
+a few frames and then seen again. (Perhaps its &#8220;mass&#8221; slipped below our
+cutoff due to noise in the video.) Memory keeps track of disappeared
+particles and maintains their ID for up to some number of frames after
+their last appearance. We&#8217;ll choose 3.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">t</span> <span class="o">=</span> <span class="n">tp</span><span class="o">.</span><span class="n">link_df</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">memory</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre>Frame 299: 402 trajectories present
+</pre></div>
+</div>
+<p>The result is the features DataFrame <tt class="docutils literal"><span class="pre">f</span></tt> with an additional column,
+<tt class="docutils literal"><span class="pre">particle</span></tt>, identifying each feature with a label.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">t</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+<div style="max-height:1000px;max-width:1500px;overflow:auto;">
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>x</th>
+      <th>y</th>
+      <th>mass</th>
+      <th>size</th>
+      <th>ecc</th>
+      <th>signal</th>
+      <th>ep</th>
+      <th>frame</th>
+      <th>particle</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td> 227.624574</td>
+      <td> 40.411627</td>
+      <td> 4696</td>
+      <td> 3.574708</td>
+      <td> 0.166794</td>
+      <td>-64.555015</td>
+      <td>-0.025293</td>
+      <td> 0</td>
+      <td> 0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td> 227.891466</td>
+      <td> 41.591638</td>
+      <td> 3492</td>
+      <td> 3.732270</td>
+      <td> 0.229409</td>
+      <td>-58.419679</td>
+      <td>-0.026230</td>
+      <td> 1</td>
+      <td> 0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td> 227.788112</td>
+      <td> 42.395982</td>
+      <td> 3634</td>
+      <td> 3.675732</td>
+      <td> 0.220305</td>
+      <td>-68.455106</td>
+      <td>-0.023443</td>
+      <td> 2</td>
+      <td> 0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td> 230.362327</td>
+      <td> 41.583934</td>
+      <td> 3610</td>
+      <td> 3.659012</td>
+      <td> 0.225123</td>
+      <td>-71.413400</td>
+      <td>-0.022326</td>
+      <td> 3</td>
+      <td> 0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td> 227.871365</td>
+      <td> 43.397195</td>
+      <td> 2923</td>
+      <td> 3.716566</td>
+      <td> 0.238247</td>
+      <td>-74.418446</td>
+      <td>-0.020592</td>
+      <td> 4</td>
+      <td> 0</td>
+    </tr>
+  </tbody>
+</table>
+</div><div class="section" id="filter-spurious-trajectories">
+<h3>Filter spurious trajectories.<a class="headerlink" href="#filter-spurious-trajectories" title="Permalink to this headline">¶</a></h3>
+<p>We have more filtering to do. Empheremeral trajectories &#8211; seen only for
+a few frames &#8211; are usually spurious and never useful. The convenience
+function <tt class="docutils literal"><span class="pre">filter_stubs</span></tt> keeps only trajectories that last for a given
+number of frames.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">t1</span> <span class="o">=</span> <span class="n">tp</span><span class="o">.</span><span class="n">filter_stubs</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+<span class="c"># Compare the number of particles in the unfiltered and filtered data.</span>
+<span class="k">print</span> <span class="s">&#39;Before:&#39;</span><span class="p">,</span> <span class="n">t</span><span class="p">[</span><span class="s">&#39;particle&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">nunique</span><span class="p">()</span>
+<span class="k">print</span> <span class="s">&#39;After:&#39;</span><span class="p">,</span> <span class="n">t1</span><span class="p">[</span><span class="s">&#39;particle&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">nunique</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre>Before: 6854
+After: 612
+</pre></div>
+</div>
+<p>We can also filter trajectories by their appearance. At this stage, with
+trajectories linked, we can look at a feature&#8217;s &#8220;average appearance&#8221;
+throughout its trajectory, giving a more accurate picture.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">tp</span><span class="o">.</span><span class="n">mass_size</span><span class="p">(</span><span class="n">t1</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">&#39;particle&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>  <span class="c"># convenience function -- just plots size vs. mass</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre>i f
+</pre></div>
+</div>
+<img alt="../_images/walkthrough_42_1.png" src="../_images/walkthrough_42_1.png" />
+<div class="highlight-python"><div class="highlight"><pre>&lt;matplotlib.axes._subplots.AxesSubplot at 0x11a412710&gt;
+</pre></div>
+</div>
+<p>The particles with especially low mass or especially large size are
+probably out of focus or aggregated, respectively. It is best to
+experiment by trial and error, filtering out regions of mass-size space
+and looking at the results using <tt class="docutils literal"><span class="pre">tp.annotate</span></tt> and <tt class="docutils literal"><span class="pre">tp.circle</span></tt>. In
+the end, we need to separate the good particles from the spurious ones,
+and it doesn&#8217;t matter how we get it done.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">condition</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="s">&#39;mass&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">2800</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="s">&#39;size&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mf">3.0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="s">&#39;ecc&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mf">0.1</span><span class="p">)</span>
+<span class="n">t2</span> <span class="o">=</span> <span class="n">tp</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">t1</span><span class="p">,</span> <span class="n">condition</span><span class="p">)</span>  <span class="c"># a wrapper for pandas&#39; filter that works around a bug in v 0.12</span>
+</pre></div>
+</div>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">tp</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="n">t2</span><span class="p">[</span><span class="n">t2</span><span class="p">[</span><span class="s">&#39;frame&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">],</span> <span class="n">frames</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</pre></div>
+</div>
+<img alt="../_images/walkthrough_45_0.png" src="../_images/walkthrough_45_0.png" />
+<div class="highlight-python"><div class="highlight"><pre>&lt;matplotlib.axes._subplots.AxesSubplot at 0x11eaf59d0&gt;
+</pre></div>
+</div>
+<p>Trace the trajectories.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">tp</span><span class="o">.</span><span class="n">plot_traj</span><span class="p">(</span><span class="n">t1</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/walkthrough_47_0.png" src="../_images/walkthrough_47_0.png" />
+<div class="highlight-python"><div class="highlight"><pre>&lt;matplotlib.axes._subplots.AxesSubplot at 0x11eac5650&gt;
+</pre></div>
+</div>
+</div>
+<div class="section" id="remove-overall-drift">
+<h3>Remove overall drift<a class="headerlink" href="#remove-overall-drift" title="Permalink to this headline">¶</a></h3>
+<p>Compute the overall drifting motion, which we will subtract away,
+adopting the reference frame of the particles&#8217; average position.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">d</span> <span class="o">=</span> <span class="n">tp</span><span class="o">.</span><span class="n">compute_drift</span><span class="p">(</span><span class="n">t1</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">d</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre>&lt;matplotlib.axes._subplots.AxesSubplot at 0x11a1198d0&gt;
+</pre></div>
+</div>
+<img alt="../_images/walkthrough_50_1.png" src="../_images/walkthrough_50_1.png" />
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">tm</span> <span class="o">=</span> <span class="n">tp</span><span class="o">.</span><span class="n">subtract_drift</span><span class="p">(</span><span class="n">t1</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>With the overall drifting motion subtracted out, we plot the
+trajectories again. We observe nice random walks.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">tp</span><span class="o">.</span><span class="n">plot_traj</span><span class="p">(</span><span class="n">tm</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/walkthrough_53_0.png" src="../_images/walkthrough_53_0.png" />
+<div class="highlight-python"><div class="highlight"><pre>&lt;matplotlib.axes._subplots.AxesSubplot at 0x11fe77590&gt;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="step-4-analyze-trajectories">
+<h2>Step 4: Analyze trajectories<a class="headerlink" href="#step-4-analyze-trajectories" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="mean-squared-displacement-of-individal-probes">
+<h3>Mean Squared Displacement of Individal Probes<a class="headerlink" href="#mean-squared-displacement-of-individal-probes" title="Permalink to this headline">¶</a></h3>
+<p>Compute the mean squared displacement of each particle and plot MSD vs.
+lag time.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">im</span> <span class="o">=</span> <span class="n">tp</span><span class="o">.</span><span class="n">imsd</span><span class="p">(</span><span class="n">tm</span><span class="p">,</span> <span class="mi">100</span><span class="o">/</span><span class="mf">285.</span><span class="p">,</span> <span class="mi">24</span><span class="p">)</span>  <span class="c"># microns per pixel = 100/285., frames per second = 24</span>
+</pre></div>
+</div>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">im</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">loglog</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s">&#39;k-&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>  <span class="c"># black lines, semitransparent, no legend</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s">r&#39;$\langle \Delta r^2 \rangle$ [$\mu$m$^2$]&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+<img alt="../_images/walkthrough_57_0.png" src="../_images/walkthrough_57_0.png" />
+<p>Since we only analyzed 300 frames, the statistics are poor at large lag
+times. With more frames, we can study larger lag times.</p>
+</div>
+<div class="section" id="ensemble-mean-squared-displacement">
+<h3>Ensemble Mean Squared Displacement<a class="headerlink" href="#ensemble-mean-squared-displacement" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">em</span> <span class="o">=</span> <span class="n">tp</span><span class="o">.</span><span class="n">emsd</span><span class="p">(</span><span class="n">tm</span><span class="p">,</span> <span class="mi">100</span><span class="o">/</span><span class="mf">285.</span><span class="p">,</span> <span class="mi">24</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre>f f
+</pre></div>
+</div>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">ax</span> <span class="o">=</span> <span class="n">em</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">loglog</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s">&#39;o&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">ylabel</span><span class="o">=</span><span class="s">r&#39;$\langle \Delta r^2 \rangle$ [$\mu$m$^2$]&#39;</span><span class="p">,</span> <span class="n">xlabel</span><span class="o">=</span><span class="s">&#39;lag time $t$&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">ylim</span><span class="o">=</span><span class="p">(</span><span class="mf">1e-2</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">[(</span><span class="mf">0.01</span><span class="p">,</span> <span class="mi">10</span><span class="p">)]</span>
+</pre></div>
+</div>
+<img alt="../_images/walkthrough_60_1.png" src="../_images/walkthrough_60_1.png" />
+<p>We can easily fit this to a power law using a convenience function,
+<tt class="docutils literal"><span class="pre">fit_powerlaw</span></tt>, that performs a linear regression in log space.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">em</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">loglog</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s">&#39;ro&#39;</span><span class="p">)</span>
+<span class="n">tp</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">fit_powerlaw</span><span class="p">(</span><span class="n">em</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/walkthrough_62_0.png" src="../_images/walkthrough_62_0.png" />
+<div style="max-height:1000px;max-width:1500px;overflow:auto;">
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>n</th>
+      <th>A</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>msd</th>
+      <td> 0.955968</td>
+      <td> 1.660323</td>
+    </tr>
+  </tbody>
+</table>
+</div><p>In water, a viscous material, the expected power-law exponent
+<span class="math">\(n = 1\)</span>. The value of <span class="math">\(A = 4D\)</span>, where <span class="math">\(D\)</span> is the
+particles&#8217; diffusivity. <span class="math">\(D\)</span> is related to viscosity <span class="math">\(\eta\)</span>,
+particle radius <span class="math">\(a\)</span>, and temperature <span class="math">\(T\)</span> as</p>
+<p><span class="math">\(D = \displaystyle\frac{kT}{6\pi\eta a}\)</span>.</p>
+<p>For paritcles with a 1 <span class="math">\(\mu\text{m}\)</span> diameter in room-temperature
+water, <span class="math">\(A \approx 1.74\)</span>. Our value above is not far off.</p>
+<p><strong>This is the end of the walkthrough. Keep reading to review the more
+advanced capabilities in trackpy.</strong></p>
+</div>
+</div>
+<div class="section" id="preview-of-advanced-features">
+<h2>Preview of Advanced Features<a class="headerlink" href="#preview-of-advanced-features" title="Permalink to this headline">¶</a></h2>
+<p>These are covered in greater detail in later tutorials.</p>
+</div>
+<div class="section" id="streaming">
+<h2>Streaming<a class="headerlink" href="#streaming" title="Permalink to this headline">¶</a></h2>
+<p>The feature-finding and trajectory-linking functions <tt class="docutils literal"><span class="pre">batch</span></tt> and
+<tt class="docutils literal"><span class="pre">link_df</span></tt> keep all of their results in memory. This approach is
+simple, but it isn&#8217;t necessary. We can prcoess an unlimited number of
+frames if we save the results as we go.</p>
+<p>Trackpy includes a class to manage storing an retrieving data framewise
+in an HDF5 format. The general idea is easily extensive to other
+formats.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="k">with</span> <span class="n">tp</span><span class="o">.</span><span class="n">PandasHDFStore</span><span class="p">(</span><span class="s">&#39;data.h5&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="n">frames</span><span class="p">:</span>
+        <span class="n">features</span> <span class="o">=</span> <span class="n">tp</span><span class="o">.</span><span class="n">locate</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="n">invert</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">minmass</span><span class="o">=</span><span class="mi">2000</span><span class="p">)</span>
+        <span class="n">s</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">features</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="k">with</span> <span class="n">tp</span><span class="o">.</span><span class="n">PandasHDFStore</span><span class="p">(</span><span class="s">&#39;data.h5&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">linked</span> <span class="ow">in</span> <span class="n">tp</span><span class="o">.</span><span class="n">link_df_iter</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">memory</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
+        <span class="n">s</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">linked</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre>Frame 299: 402 trajectories present
+</pre></div>
+</div>
+<p>You can get results by frame with <tt class="docutils literal"><span class="pre">s.get(frame_number)</span></tt> or, when you
+have sufficient memory, retrieve them all. The results is identifical to
+what you would obtained using the basic functions <tt class="docutils literal"><span class="pre">batch</span></tt> and
+<tt class="docutils literal"><span class="pre">link_df</span></tt>.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="k">with</span> <span class="n">tp</span><span class="o">.</span><span class="n">PandasHDFStore</span><span class="p">(</span><span class="s">&#39;data.h5&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
+    <span class="n">trajectories</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">s</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="optional-high-performance-components-numba-and-fftw">
+<h2>Optional High Performance Components: Numba and FFTW<a class="headerlink" href="#optional-high-performance-components-numba-and-fftw" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="numba">
+<h3>Numba<a class="headerlink" href="#numba" title="Permalink to this headline">¶</a></h3>
+<p>The core, time-consuming steps in particle location and linking are
+implemented in Python/numpy and also in pure Python optimized for numba.
+If numba is installed, trackpy will detect it and use it by default. You
+can switch it on and off to compare performance.</p>
+<div class="code python highlight-python"><div class="highlight"><pre>%timeit tp.batch(frames[:10], 11, invert=True, minmass=2000, engine=&#39;numba&#39;)
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre>Frame 9: 362 features
+1 loops, best of 3: 4.34 s per loop
+</pre></div>
+</div>
+<div class="code python highlight-python"><div class="highlight"><pre>%timeit tp.batch(frames[:10], 11, invert=True, minmass=2000, engine=&#39;python&#39;)
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre>Frame 9: 353 features
+1 loops, best of 3: 13.2 s per loop
+</pre></div>
+</div>
+<p>The linking functions <tt class="docutils literal"><span class="pre">link_df</span></tt> or <tt class="docutils literal"><span class="pre">link_df_iter</span></tt> support various
+options for <tt class="docutils literal"><span class="pre">link_strategy</span></tt>, one of which is numba-based. Read the
+their docstrings for details.</p>
+</div>
+<div class="section" id="fftw-fastest-fourier-transform-in-the-west">
+<h3>FFTW (&#8220;Fastest Fourier Transform in the West&#8221;)<a class="headerlink" href="#fftw-fastest-fourier-transform-in-the-west" title="Permalink to this headline">¶</a></h3>
+<p><tt class="docutils literal"><span class="pre">locate</span></tt> spends roughly half of its time performing a Fast Fourier
+Transform of the image. (This is the key step in performing a bandpass
+filter, which removes small-scale noise and large-scale variation in
+image brightness.) FFTW is a drop-in replacement for numpy&#8217;s FFT. If
+trackpy can find pyFFTW, it will use it instead of <tt class="docutils literal"><span class="pre">numpy.fft</span></tt>.</p>
+</div>
+</div>
+<div class="section" id="parellelization">
+<h2>Parellelization<a class="headerlink" href="#parellelization" title="Permalink to this headline">¶</a></h2>
+<p>Feature-finding can easily be parallelized: each frame an independent
+task, and the tasks can be divided among the available CPUs. IPython
+parallel makes this very straightforward.</p>
+<p>It is simplest to try this on the CPUs of the local machine. To do this
+from an IPython notebook, go to File &gt; Open, and click the &#8220;Clusters&#8221;
+tab. Fill in the &#8220;engines&#8221; field with the number of available CPUs
+(e.g., 4) and click start. Now you are running a cluster &#8211; it&#8217;s that
+easy. More information on IPython parallel is available in <a class="reference external" href="http://ipython.org/ipython-doc/stable/parallel/">this section
+of the IPython
+documentation</a>.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">IPython</span> <span class="kn">import</span> <span class="n">parallel</span>
+<span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">display</span>
+
+<span class="n">client</span> <span class="o">=</span> <span class="n">parallel</span><span class="o">.</span><span class="n">Client</span><span class="p">()</span>
+<span class="n">view</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">load_balanced_view</span><span class="p">()</span>
+
+<span class="n">client</span><span class="p">[:]</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre>&lt;DirectView [0, 1, 2, 3]&gt;
+</pre></div>
+</div>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">curried_locate</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">image</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">locate</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">diameter</span><span class="o">=</span><span class="mi">13</span><span class="p">,</span> <span class="n">invert</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-python"><div class="highlight"><pre>%%px
+
+import trackpy as tp
+</pre></div>
+</div>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">view</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">curried_locate</span><span class="p">,</span> <span class="n">frames</span><span class="p">[:</span><span class="mi">4</span><span class="p">])</span>  <span class="c"># Optionally, prime each engine: make it set up FFTW.</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre>&lt;AsyncMapResult: &lt;lambda&gt;&gt;
+</pre></div>
+</div>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">amr</span> <span class="o">=</span> <span class="n">view</span><span class="o">.</span><span class="n">map_async</span><span class="p">(</span><span class="n">curried_locate</span><span class="p">,</span> <span class="n">frames</span><span class="p">[:</span><span class="mi">32</span><span class="p">])</span>
+<span class="n">amr</span><span class="o">.</span><span class="n">wait_interactive</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre>  32/32 tasks finished after    6 s
+done
+</pre></div>
+</div>
+<div class="code python highlight-python"><div class="highlight"><pre>%time serial_result = map(curried_locate, frames[:32])
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre>CPU times: user 13 s, sys: 602 ms, total: 13.6 s
+Wall time: 13.6 s
+</pre></div>
+</div>
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+<div id="sourcelink">
+  <a href="../_sources/tutorial/walkthrough.txt"
+     rel="nofollow">Source</a>
+</div>
+      
+    </p>
+    <p>
+        &copy; Copyright 2010-2014, Trackpy Contributors.<br/>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2.3.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>
